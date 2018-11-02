@@ -1,7 +1,5 @@
 ---
 
-kubernetes_master: true
-
 kubernetes_apiserver_ip: 192.168.10.120
 
 keepalived_vrrp_nic: "enp0s8"

@@ -30,8 +30,11 @@
 
 - name: include etcd tasks
   include_tasks: etcd.yml
-  when: kubernetes_etcd
+  when: inventory_hostname in groups.etcd
 
 - name: include master tasks
-  include: master.yml
-  when: kubernetes_master
+  include_tasks: master.yml
+  when: inventory_hostname in groups.k8s_masters
+
+- name: include join tasks
+  include_tasks: join.yml

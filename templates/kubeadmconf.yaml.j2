@@ -9,7 +9,7 @@ auditPolicy:
   logMaxAge: {{ kubernetes_log_age }}
   path: ""
 etcd:
-{% if kubernetes_etcd %}
+{% if inventory_hostname in groups.etcd %}
   local:
     dataDir: {{ kubernetes_etcd_data_dir }}
     image: {{ kubernetes_etcd_image }}
@@ -40,7 +40,7 @@ etcd:
     certFile: {{ kubernetes_certs_dir }}/apiserver-etcd-client.crt
     keyFile: {{ kubernetes_certs_dir }}/apiserver-etcd-client.key
 {% endif %}
-{% if kubernetes_master %}
+{% if inventory_hostname in groups.k8s_masters %}
 apiServerCertSANs:
 - "{{ kubernetes_apiserver_ip}}"
   {%- if kubernetes_apiserver_dns != "" %}

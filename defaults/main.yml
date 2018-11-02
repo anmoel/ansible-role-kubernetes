@@ -1,9 +1,5 @@
 ---
 
-kubernetes_etcd: false
-kubernetes_master: false
-kubernetes_node: false
-
 # Install vars
 kubernetes_packages:
   - name: kubelet

@@ -1,3 +1,4 @@
+---
 
 - name: get config files from primary master
   delegate_to: "{{ groups.k8s_masters[0] }}"
