@@ -1,11 +1,8 @@
 
 - name: get config files from primary master
-  delegate_to: "{{ groups.kube_masters[0] }}"
-  fetch:
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  slurp:
     src: "{{ item }}"
-    dest: /tmp/master{{ item }}
-    flat: yes
-  run_once: true
   with_items:
     - /etc/kubernetes/pki/ca.crt
     - /etc/kubernetes/pki/ca.key
@@ -14,20 +11,13 @@
     - /etc/kubernetes/pki/front-proxy-ca.crt
     - /etc/kubernetes/pki/front-proxy-ca.key
     - /etc/kubernetes/admin.conf
-  changed_when: False
+  register: master_certs_configs_register
 
-- name: copy config files to secondary masters
+- name: copy config files to all masters
   copy:
-    src: "/tmp/master{{ item }}"
-    dest: "{{ item }}"
-  with_items:
-    - /etc/kubernetes/pki/ca.crt
-    - /etc/kubernetes/pki/ca.key
-    - /etc/kubernetes/pki/sa.key
-    - /etc/kubernetes/pki/sa.pub
-    - /etc/kubernetes/pki/front-proxy-ca.crt
-    - /etc/kubernetes/pki/front-proxy-ca.key
-    - /etc/kubernetes/admin.conf
+    content: '{{ item.content | b64decode }}'
+    dest: "{{ item.source }}"
+  with_items: "{{ master_certs_configs_register.results }}"
 
 - name: gen certs on master ha nodes
   shell: kubeadm alpha phase certs all --config /etc/kubernetes/kubeadm/kubeadmconf.yaml

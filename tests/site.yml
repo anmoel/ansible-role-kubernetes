@@ -6,4 +6,4 @@
   roles:
     - geerlingguy.docker
     - { role: evrardjp.keepalived, when: kubernetes_master }
-    - ansible-role-kubernetes
+    - { role: ansible-role-kubernetes, tags: k8s }

@@ -16,27 +16,25 @@
 
 - name: generate etcd-ca cert
   command: kubeadm alpha phase certs etcd-ca --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
-  when: "inventory_hostname == groups.etcd[0] and etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
+  when: "etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
+  delegate_to: "{{ groups.etcd[0] }}"
+  run_once: true
 
 - name: get config files from first etcd node
   delegate_to: "{{ groups.etcd[0] }}"
-  fetch:
+  slurp:
     src: "{{ item }}"
-    dest: /tmp/etcd{{ item }}
-    flat: yes
-  run_once: true
   with_items:
     - /etc/kubernetes/pki/etcd/ca.crt
     - /etc/kubernetes/pki/etcd/ca.key
-  changed_when: False
+  register: etcd_ca_certs_register
+  run_once: true
 
 - name: copy config files to etcd replica nodes
   copy:
-    src: "/tmp/etcd{{ item }}"
-    dest: "{{ item }}"
-  with_items:
-    - /etc/kubernetes/pki/etcd/ca.crt
-    - /etc/kubernetes/pki/etcd/ca.key
+    content: '{{ item.content | b64decode }}'
+    dest: "{{ item.source }}"
+  with_items: "{{ etcd_ca_certs_register.results }}"
 
 - name: check /etc/kubernetes/pki/etcd/server.crt/.key exists
   stat:
@@ -85,18 +83,6 @@
 - name: generate etcd-apiserver-etcd-client cert
   command: kubeadm alpha phase certs apiserver-etcd-client --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
   when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
-
-- name: get apiserver-etcd-client.crt files from first etcd node
-  delegate_to: "{{ groups.etcd[0] }}"
-  fetch:
-    src: "{{ item }}"
-    dest: /tmp/etcd{{ item }}
-    flat: yes
-  run_once: true
-  with_items:
-    - /etc/kubernetes/pki/apiserver-etcd-client.crt
-    - /etc/kubernetes/pki/apiserver-etcd-client.key
-  changed_when: False
 
 - name: check /etc/kubernetes/manifests/etcd.yaml exists
   stat:

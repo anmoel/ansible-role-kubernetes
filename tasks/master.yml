@@ -5,23 +5,31 @@
     state: directory
     path: /etc/kubernetes/pki/etcd
 
-- name: copy etcd cert files to master nodes
-  copy:
-    src: "/tmp/etcd{{ item }}"
-    dest: "{{ item }}"
+- name: get apiserver-etcd-client.crt files from first etcd node
+  delegate_to: "{{ groups.etcd[0] }}"
+  slurp:
+    src: "{{ item }}"
   with_items:
-    - /etc/kubernetes/pki/etcd/ca.crt
     - /etc/kubernetes/pki/apiserver-etcd-client.crt
     - /etc/kubernetes/pki/apiserver-etcd-client.key
+  register: etcd_apiserver_certs_register
+
+- name: copy etcd cert files to master nodes
+  copy:
+    content: '{{ item.content | b64decode }}'
+    dest: "{{ item.source }}"
+  with_items:
+    - "{{ etcd_ca_certs_register.results }}"
+    - "{{ etcd_apiserver_certs_register.results }}"
 
 - name: initial at first master
   shell: "kubeadm init --config /etc/kubernetes/kubeadm/kubeadmconf.yaml"
   register: init_output
-  when: inventory_hostname == groups.kube_masters[0]
+  when: inventory_hostname == groups.k8s_masters[0]
 
 - debug: var=init_output
-  when: inventory_hostname == groups.kube_masters[0]
+  when: inventory_hostname == groups.k8s_masters[0]
 
 - name: incluse CentOS prepare tasks
   include: master-ha.yml
-  when: ( groups.kube_master | length > 1 ) and inventory_hostname != groups.kube_masters[0]
+  when: ( groups.k8s_master | length > 1 ) and inventory_hostname != groups.k8s_masters[0]

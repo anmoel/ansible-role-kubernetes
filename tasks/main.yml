@@ -8,15 +8,15 @@
     - default.yml
 
 - name: include Ubuntu prepare tasks
-  include: prepare-ubuntu.yml
+  import_tasks: prepare-ubuntu.yml
   when: ansible_distribution == "Ubuntu"
 
 - name: incluse CentOS prepare tasks
-  include: prepare-centos.yml
+  import_tasks: prepare-centos.yml
   when: ansible_distribution == "CentOS"
 
 - name: include install tasks
-  include: install.yml
+  import_tasks: install.yml
 
 - name: ensure folder kubeadm exists
   file:
@@ -29,38 +29,9 @@
     dest: /etc/kubernetes/kubeadm/kubeadmconf.yaml
 
 - name: include etcd tasks
-  include: etcd.yml
+  include_tasks: etcd.yml
   when: kubernetes_etcd
 
 - name: include master tasks
   include: master.yml
   when: kubernetes_master
-
-
-- name: clear etcd tmp files
-  delegate_to: localhost
-  file:
-    dest: /tmp/etcd{{ item }}
-    state: absent
-  with_items:
-    - /etc/kubernetes/pki/etcd/ca.crt
-    - /etc/kubernetes/pki/etcd/ca.key
-    - /etc/kubernetes/pki/apiserver-etcd-client.crt
-    - /etc/kubernetes/pki/apiserver-etcd-client.key
-  changed_when: False
-
-
-- name: clear master tmp files
-  delegate_to: localhost
-  file:
-    dest: /tmp/master{{ item }}
-    state: absent
-  with_items:
-    - /etc/kubernetes/pki/ca.crt
-    - /etc/kubernetes/pki/ca.key
-    - /etc/kubernetes/pki/sa.key
-    - /etc/kubernetes/pki/sa.pub
-    - /etc/kubernetes/pki/front-proxy-ca.crt
-    - /etc/kubernetes/pki/front-proxy-ca.key
-    - /etc/kubernetes/admin.conf
-  changed_when: False

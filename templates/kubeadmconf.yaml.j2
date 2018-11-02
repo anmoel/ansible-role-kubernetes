@@ -31,9 +31,9 @@ etcd:
 {% else %}
 etcd:
   endpoints:
-  {%- for n in groups.etcd %}
+{% for n in groups.etcd %}
     - "https://{{ hostvars[n]['ansible_ssh_host'] }}:2379"
-  {%- endfor %}]
+{% endfor %}
   caFile: /etc/kubernetes/pki/etcd/ca.crt
   certFile: /etc/kubernetes/pki/apiserver-etcd-client.crt
   keyFile: /etc/kubernetes/pki/apiserver-etcd-client.key
