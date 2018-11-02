@@ -1,9 +1,8 @@
 ---
 
 - name: "deploy canal network plugin #1"
-  shell: "kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/rbac.yaml"
-  when: inventory_hostname == groups.k8s_masters[0]
+  shell: "kubectl apply --kubeconfig /etc/kubernetes/admin.conf -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/rbac.yaml"
+
 
 - name: "deploy canal network plugin #2"
-  shell: "kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/canal.yaml"
-  when: inventory_hostname == groups.k8s_masters[0]
+  shell: "kubectl apply --kubeconfig /etc/kubernetes/admin.conf -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/canal.yaml"
