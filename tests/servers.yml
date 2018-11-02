@@ -1,0 +1,26 @@
+---
+- name: etcd-01
+  box: ubuntu/bionic64 #centos/7
+  cpus: 1
+  ram: 1024
+  ip: 192.168.10.110
+- name: etcd-02
+  box: ubuntu/bionic64 #centos/7
+  cpus: 1
+  ram: 1024
+  ip: 192.168.10.111
+- name: etcd-03
+  box: ubuntu/bionic64 #centos/7
+  cpus: 1
+  ram: 1024
+  ip: 192.168.10.112
+- name: k8s-master-01
+  box: ubuntu/bionic64 #centos/7
+  cpus: 2
+  ram: 2048
+  ip: 192.168.10.121
+- name: k8s-master-02
+  box: ubuntu/bionic64 #centos/7
+  cpus: 2
+  ram: 2048
+  ip: 192.168.10.122

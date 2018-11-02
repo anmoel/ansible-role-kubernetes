@@ -1,0 +1,66 @@
+---
+
+- name: Load a variable file based on the OS type, or a default if not found. Using free-form to specify the file.
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - default.yml
+
+- name: include Ubuntu prepare tasks
+  include: prepare-ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: incluse CentOS prepare tasks
+  include: prepare-centos.yml
+  when: ansible_distribution == "CentOS"
+
+- name: include install tasks
+  include: install.yml
+
+- name: ensure folder kubeadm exists
+  file:
+    state: directory
+    path: /etc/kubernetes/kubeadm
+
+- name: ensure kubeadm config exists
+  template:
+    src: kubeadmconf.yaml.j2
+    dest: /etc/kubernetes/kubeadm/kubeadmconf.yaml
+
+- name: include etcd tasks
+  include: etcd.yml
+  when: kubernetes_etcd
+
+- name: include master tasks
+  include: master.yml
+  when: kubernetes_master
+
+
+- name: clear etcd tmp files
+  delegate_to: localhost
+  file:
+    dest: /tmp/etcd{{ item }}
+    state: absent
+  with_items:
+    - /etc/kubernetes/pki/etcd/ca.crt
+    - /etc/kubernetes/pki/etcd/ca.key
+    - /etc/kubernetes/pki/apiserver-etcd-client.crt
+    - /etc/kubernetes/pki/apiserver-etcd-client.key
+  changed_when: False
+
+
+- name: clear master tmp files
+  delegate_to: localhost
+  file:
+    dest: /tmp/master{{ item }}
+    state: absent
+  with_items:
+    - /etc/kubernetes/pki/ca.crt
+    - /etc/kubernetes/pki/ca.key
+    - /etc/kubernetes/pki/sa.key
+    - /etc/kubernetes/pki/sa.pub
+    - /etc/kubernetes/pki/front-proxy-ca.crt
+    - /etc/kubernetes/pki/front-proxy-ca.key
+    - /etc/kubernetes/admin.conf
+  changed_when: False

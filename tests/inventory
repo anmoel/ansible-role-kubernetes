@@ -1,0 +1,16 @@
+[kubernetes:children]
+etcd
+k8s_masters
+k8s_nodes
+
+
+[etcd]
+etcd-01 ansible_ssh_host=192.168.10.110 ansible_user=vagrant
+etcd-02 ansible_ssh_host=192.168.10.111 ansible_user=vagrant
+etcd-03 ansible_ssh_host=192.168.10.112 ansible_user=vagrant
+
+[k8s_masters]
+k8s-master-01 ansible_ssh_host=192.168.10.121 ansible_user=vagrant
+#k8s-master-02 ansible_ssh_host=192.168.10.122 ansible_user=vagrant
+
+[k8s_nodes]

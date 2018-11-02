@@ -1,0 +1,9 @@
+---
+
+- hosts: kubernetes
+  become: true
+  become_user: root
+  roles:
+    - geerlingguy.docker
+    - { role: evrardjp.keepalived, when: kubernetes_master }
+    - ansible-role-kubernetes

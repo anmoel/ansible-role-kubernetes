@@ -1,0 +1,31 @@
+---
+
+kubernetes_etcd: false
+kubernetes_master: false
+kubernetes_node: false
+
+# Install vars
+kubernetes_packages:
+  - name: kubelet
+    state: present
+  - name: kubectl
+    state: present
+  - name: kubeadm
+    state: present
+  - name: kubernetes-cni
+    state: present
+
+kubernetes_version: '1.12'
+kubernetes_version_rhel_package: '1.12.1'
+kubernetes_yum_arch: x86_64
+kubernetes_apt_repo_url: http://apt.kubernetes.io/
+kubernetes_apt_repo_pool: kubernetes-xenial
+
+kubernetes_apiserver_dns: ""
+kubernetes_apiserver_port: "6443"
+# Kubelet vars
+kubernetes_kubelet_extra_args: ""
+
+# kubeadm vars
+kubernetes_enable_web_ui: true
+kubernetes_version_kubeadm: 'stable-{{ kubernetes_version }}'

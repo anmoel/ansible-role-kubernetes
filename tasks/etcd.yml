@@ -1,0 +1,144 @@
+---
+
+- name: ensure folder pki/etcd exists
+  file:
+    state: directory
+    path: /etc/kubernetes/pki/etcd
+
+- name: check /etc/kubernetes/pki/etcd/ca.crt / ca.key exists
+  stat:
+    path: "{{ item }}"
+  register: etcd_ca_result
+  when: "inventory_hostname == groups.etcd[0]"
+  with_items:
+    - /etc/kubernetes/pki/etcd/ca.crt
+    - /etc/kubernetes/pki/etcd/ca.key
+
+- name: generate etcd-ca cert
+  command: kubeadm alpha phase certs etcd-ca --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  when: "inventory_hostname == groups.etcd[0] and etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
+
+- name: get config files from first etcd node
+  delegate_to: "{{ groups.etcd[0] }}"
+  fetch:
+    src: "{{ item }}"
+    dest: /tmp/etcd{{ item }}
+    flat: yes
+  run_once: true
+  with_items:
+    - /etc/kubernetes/pki/etcd/ca.crt
+    - /etc/kubernetes/pki/etcd/ca.key
+  changed_when: False
+
+- name: copy config files to etcd replica nodes
+  copy:
+    src: "/tmp/etcd{{ item }}"
+    dest: "{{ item }}"
+  with_items:
+    - /etc/kubernetes/pki/etcd/ca.crt
+    - /etc/kubernetes/pki/etcd/ca.key
+
+- name: check /etc/kubernetes/pki/etcd/server.crt/.key exists
+  stat:
+    path: "{{ item }}"
+  register: etcd_server_result
+  with_items:
+    - /etc/kubernetes/pki/etcd/server.crt
+    - /etc/kubernetes/pki/etcd/server.key
+
+- name: generate etcd-server cert
+  command: kubeadm alpha phase certs etcd-server --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  when: "etcd_server_result.results[0].stat.exists == False and etcd_server_result.results[1].stat.exists == False"
+
+- name: check /etc/kubernetes/pki/etcd/peer.crt/.key exists
+  stat:
+    path: "{{ item }}"
+  register: etcd_peer_result
+  with_items:
+    - /etc/kubernetes/pki/etcd/peer.crt
+    - /etc/kubernetes/pki/etcd/peer.key
+
+- name: generate etcd-peer cert
+  command: kubeadm alpha phase certs etcd-peer --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  when: "etcd_peer_result.results[0].stat.exists == False and etcd_peer_result.results[1].stat.exists == False"
+
+- name: check /etc/kubernetes/pki/etcd/healthcheck-client.crt/.key exists
+  stat:
+    path: "{{ item }}"
+  register: etcd_health_result
+  with_items:
+    - /etc/kubernetes/pki/etcd/healthcheck-client.crt
+    - /etc/kubernetes/pki/etcd/healthcheck-client.key
+
+- name: generate etcd-healthcheck-client cert
+  command: kubeadm alpha phase certs etcd-healthcheck-client --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  when: "etcd_health_result.results[0].stat.exists == False and etcd_health_result.results[1].stat.exists == False"
+
+- name: check /etc/kubernetes/pki/apiserver-etcd-client.crt/.key exists
+  stat:
+    path: "{{ item }}"
+  register: etcd_apiclient_result
+  with_items:
+    - /etc/kubernetes/pki/apiserver-etcd-client.crt
+    - /etc/kubernetes/pki/apiserver-etcd-client.key
+
+- name: generate etcd-apiserver-etcd-client cert
+  command: kubeadm alpha phase certs apiserver-etcd-client --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
+
+- name: get apiserver-etcd-client.crt files from first etcd node
+  delegate_to: "{{ groups.etcd[0] }}"
+  fetch:
+    src: "{{ item }}"
+    dest: /tmp/etcd{{ item }}
+    flat: yes
+  run_once: true
+  with_items:
+    - /etc/kubernetes/pki/apiserver-etcd-client.crt
+    - /etc/kubernetes/pki/apiserver-etcd-client.key
+  changed_when: False
+
+- name: check /etc/kubernetes/manifests/etcd.yaml exists
+  stat:
+    path: /etc/kubernetes/manifests/etcd.yaml
+  register: stat_result
+
+- name: generate pod manifest file for etcd
+  command: kubeadm alpha phase etcd local --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  when: "stat_result.stat.exists == False"
+  register: etcd_pod_result
+
+- name: ensure kubeadm config exists
+  template:
+    src: kubelet.service.d.j2
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  register: kubelet_config_file
+
+- name: Reload systemd unit if args were changed.
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: kubelet
+  when: kubelet_config_file is changed
+
+- name: Ensure kubelet is started and enabled at boot.
+  service:
+    name: kubelet
+    state: started
+    enabled: true
+
+- name: wait for etcd-cluster
+  wait_for:
+    host: '{{ ansible_ssh_host }}'
+    port: 2379
+
+- name: test etcd cluster
+  docker_container:
+    name: etcdctl
+    image: quay.io/coreos/etcd:v3.2.18
+    cleanup: yes
+    detach: no
+    volumes:
+      - /etc/kubernetes:/etc/kubernetes
+    command: "etcdctl --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --ca-file /etc/kubernetes/pki/etcd/ca.crt --endpoints https://{{ ansible_ssh_host }}:2379 cluster-health"
+  changed_when: False

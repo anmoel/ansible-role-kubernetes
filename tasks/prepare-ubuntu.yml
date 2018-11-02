@@ -1,0 +1,17 @@
+---
+
+- name: "Add gpg key (Ubuntu)"
+  apt_key:
+    url: "{{ kubernetes_debian_apt_key }}"
+    state: present
+
+- name: "Add kubernetes source list (Ubuntu)"
+  apt_repository:
+    repo: "deb {{ kubernetes_apt_repo_url }} {{ kubernetes_apt_repo_pool }} main"
+    state: present
+    filename: "kubernetes"
+
+- name: "Update the repository cache (Ubuntu)"
+  apt:
+    update_cache: yes
+  changed_when: false
