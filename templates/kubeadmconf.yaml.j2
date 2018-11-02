@@ -8,8 +8,8 @@ auditPolicy:
   logDir: /var/log/kubernetes/audit
   logMaxAge: 2
   path: ""
-{% if kubernetes_etcd %}
 etcd:
+{% if kubernetes_etcd %}
   local:
     dataDir: /var/etcd
     image: ""
@@ -29,14 +29,14 @@ etcd:
       advertise-client-urls: https://{{ ansible_ssh_host }}:2379
       initial-advertise-peer-urls: https://{{ ansible_ssh_host }}:2380
 {% else %}
-etcd:
-  endpoints:
+  external:
+    endpoints:
 {% for n in groups.etcd %}
     - "https://{{ hostvars[n]['ansible_ssh_host'] }}:2379"
 {% endfor %}
-  caFile: /etc/kubernetes/pki/etcd/ca.crt
-  certFile: /etc/kubernetes/pki/apiserver-etcd-client.crt
-  keyFile: /etc/kubernetes/pki/apiserver-etcd-client.key
+    caFile: /etc/kubernetes/pki/etcd/ca.crt
+    certFile: /etc/kubernetes/pki/apiserver-etcd-client.crt
+    keyFile: /etc/kubernetes/pki/apiserver-etcd-client.key
 {% endif %}
 {% if kubernetes_master %}
 apiServerCertSANs:

@@ -1,9 +1,14 @@
 ---
 
+- hosts: k8s_masters
+  become: true
+  become_user: root
+  roles:
+    - evrardjp.keepalived
+
 - hosts: kubernetes
   become: true
   become_user: root
   roles:
     - geerlingguy.docker
-    - { role: evrardjp.keepalived, when: kubernetes_master }
     - { role: ansible-role-kubernetes, tags: k8s }
