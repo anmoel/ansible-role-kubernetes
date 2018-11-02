@@ -1,0 +1,25 @@
+---
+
+- name: check node is already in cluster
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  shell: "kubectl get nodes -n kube-system --kubeconfig /etc/kubernetes/admin.conf -o name"
+  register: get_node_register
+  changed_when: false
+
+- name: get join command from master
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  shell: "kubeadm token create --print-join-command"
+  changed_when: false
+  when: ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
+  register: join_command_register
+
+- name: Ensure kubelet is stopped and enabled at boot.
+  service:
+    name: kubelet
+    state: stopped
+    enabled: true
+  when: ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
+
+- name: join node into cluster
+  shell: "{{ join_command_register.stdout }} --ignore-preflight-errors DirAvailable--etc-kubernetes-manifests"
+  when: ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
