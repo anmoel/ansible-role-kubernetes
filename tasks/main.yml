@@ -36,5 +36,8 @@
   include_tasks: master.yml
   when: inventory_hostname in groups.k8s_masters
 
+- name: include network plugin tasks
+  include_tasks: network_plugin.yml
+
 - name: include join tasks
   include_tasks: join.yml

@@ -31,8 +31,8 @@ kubernetes_etcd_image: ""
 kubernetes_authorization_mode: "Node,RBAC"
 kubernetes_enable_admission_plugins: "Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota"
 kubernetes_dns_domain: "cluster.local"
-kubernetes_pod_subnet: ""
-kubernetes_service_subnet: "10.96.0.0/12"
+kubernetes_pod_subnet: "10.244.0.0/16"
+kubernetes_service_subnet: "10.96.0.0/16"
 
 # Kubelet vars
 kubernetes_kubelet_extra_args: ""
