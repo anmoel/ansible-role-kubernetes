@@ -1,29 +1,31 @@
 apiVersion: "kubeadm.k8s.io/v1alpha3"
 kind: ClusterConfiguration
-imageRepository: k8s.gcr.io
-kubernetesVersion: v1.12.0
-certificatesDir: /etc/kubernetes/pki
-clusterName: kubernetes
+imageRepository: {{ kubernetes_imageRepository }}
+kubernetesVersion: {{ kubernetes_master_version }}
+certificatesDir: {{ kubernetes_certs_dir }}
+clusterName: {{ kubernetes_cluster_name }}
 auditPolicy:
-  logDir: /var/log/kubernetes/audit
-  logMaxAge: 2
+  logDir: {{ kubernetes_log_dir }}
+  logMaxAge: {{ kubernetes_log_age }}
   path: ""
 etcd:
 {% if kubernetes_etcd %}
   local:
-    dataDir: /var/etcd
-    image: ""
+    dataDir: {{ kubernetes_etcd_data_dir }}
+    image: {{ kubernetes_etcd_image }}
     serverCertSANs:
     - "{{ ansible_hostname }}"
+    - "{{ ansible_nodename }}"
     - "{{ ansible_ssh_host }}"
     peerCertSANs:
     - "{{ ansible_hostname }}"
+    - "{{ ansible_nodename }}"
     - "{{ ansible_ssh_host }}"
     extraArgs:
       initial-cluster: {% for n in groups.etcd %}{{ hostvars[n]['ansible_hostname'] }}=https://{{ hostvars[n]['ansible_ssh_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}
 
       initial-cluster-state: new
-      name: {{ ansible_hostname }}
+      name: {{ ansible_nodename }}
       listen-peer-urls: https://{{ ansible_ssh_host }}:2380
       listen-client-urls: https://{{ ansible_ssh_host }}:2379
       advertise-client-urls: https://{{ ansible_ssh_host }}:2379
@@ -34,9 +36,9 @@ etcd:
 {% for n in groups.etcd %}
     - "https://{{ hostvars[n]['ansible_ssh_host'] }}:2379"
 {% endfor %}
-    caFile: /etc/kubernetes/pki/etcd/ca.crt
-    certFile: /etc/kubernetes/pki/apiserver-etcd-client.crt
-    keyFile: /etc/kubernetes/pki/apiserver-etcd-client.key
+    caFile: {{ kubernetes_certs_dir }}/etcd/ca.crt
+    certFile: {{ kubernetes_certs_dir }}/apiserver-etcd-client.crt
+    keyFile: {{ kubernetes_certs_dir }}/apiserver-etcd-client.key
 {% endif %}
 {% if kubernetes_master %}
 apiServerCertSANs:
@@ -50,10 +52,10 @@ controlPlaneEndpoint: "{{ kubernetes_apiserver_ip}}:{{ kubernetes_apiserver_port
   {%- endif %}
 
 apiServerExtraArgs:
-  authorization-mode: Node,RBAC
-  enable-admission-plugins: Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota
+  authorization-mode: {{ kubernetes_authorization_mode }}
+  enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
 networking:
-  dnsDomain: cluster.local
-  podSubnet: ""
-  serviceSubnet: 10.96.0.0/12
+  dnsDomain: {{ kubernetes_dns_domain }}
+  podSubnet: {{ kubernetes_pod_subnet }}
+  serviceSubnet: {{ kubernetes_service_subnet }}
 {% endif %}
