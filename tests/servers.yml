@@ -26,6 +26,6 @@
   ip: 192.168.10.122
 - name: k8s-worker-01
   box: ubuntu/bionic64 #centos/7
-  cpus: 2
+  cpus: 1
   ram: 2048
   ip: 192.168.10.130
