@@ -14,3 +14,4 @@ k8s-master-01 ansible_ssh_host=192.168.10.121 ansible_user=vagrant
 k8s-master-02 ansible_ssh_host=192.168.10.122 ansible_user=vagrant
 
 [k8s_nodes]
+k8s-worker-01 ansible_ssh_host=192.168.10.130 ansible_user=vagrant
