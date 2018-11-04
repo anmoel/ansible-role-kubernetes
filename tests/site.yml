@@ -11,4 +11,4 @@
   become_user: root
   roles:
     - geerlingguy.docker
-    - { role: ansible-role-kubernetes, tags: k8s }
+    - { role: anmoel.kubernetes, tags: k8s }
