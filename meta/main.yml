@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: kubernetes
   author: André Möller
   description: this role install an high available / non high available kubernetes cluster with kubeadm.
   license: Apache License 2.0
