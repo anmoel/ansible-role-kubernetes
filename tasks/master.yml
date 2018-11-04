@@ -23,14 +23,14 @@
     - "{{ etcd_apiserver_certs_register.results }}"
 
 - name: run preflight checks
-  shell: kubeadm alpha phase preflight master --config /etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase preflight master --config /etc/kubernetes/kubeadm/kubeadmconf.yaml
   when: inventory_hostname == groups.k8s_masters[0]
   register: master_preflight_register
   changed_when: false
   failed_when: false
 
 - name: initial at first master
-  shell: "kubeadm init --config /etc/kubernetes/kubeadm/kubeadmconf.yaml"
+  command: "kubeadm init --config /etc/kubernetes/kubeadm/kubeadmconf.yaml"
   when: inventory_hostname == groups.k8s_masters[0] and master_preflight_register.rc == 0
   register: init_output
 
