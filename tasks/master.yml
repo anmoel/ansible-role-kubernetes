@@ -37,6 +37,6 @@
 - debug: var=init_output
   when: inventory_hostname == groups.k8s_masters[0]
 
-- name: incluse CentOS prepare tasks
+- name: include master ha tasks
   include: master-ha.yml
   when: ( groups.k8s_masters | length > 1 ) and inventory_hostname != groups.k8s_masters[0]

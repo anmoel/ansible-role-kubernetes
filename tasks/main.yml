@@ -11,7 +11,7 @@
   import_tasks: prepare-ubuntu.yml
   when: ansible_distribution == "Ubuntu"
 
-- name: incluse CentOS prepare tasks
+- name: include CentOS prepare tasks
   import_tasks: prepare-centos.yml
   when: ansible_distribution == "CentOS"
 
