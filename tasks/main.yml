@@ -40,5 +40,13 @@
   include_tasks: network_plugin.yml
   when: inventory_hostname == groups.k8s_masters[0]
 
-- name: include join tasks
+- name: include join worker tasks
   include_tasks: join.yml
+  when:
+    - inventory_hostname not in groups.k8s_masters
+    - inventory_hostname not in groups.etcd
+
+- name: include update master tasks
+  include_tasks: update_master.yml
+  when: inventory_hostname in groups.k8s_masters
+  tags: k8s_update
