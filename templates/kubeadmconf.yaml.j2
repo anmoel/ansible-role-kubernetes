@@ -42,13 +42,13 @@ etcd:
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
 apiServerCertSANs:
-- "{{ kubernetes_apiserver_ip}}"
+- "{{ kubernetes_apiserver_ip }}"
   {%- if kubernetes_apiserver_dns != "" %}
 - "{{ kubernetes_apiserver_dns }}"
-controlPlaneEndpoint: "{{ kubernetes_apiserver_dns}}:{{ kubernetes_apiserver_port}}"
+controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
   {%- else %}
 
-controlPlaneEndpoint: "{{ kubernetes_apiserver_ip}}:{{ kubernetes_apiserver_port}}"
+controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_ssh_host']) }}:{{ kubernetes_apiserver_port}}"
   {%- endif %}
 
 apiServerExtraArgs:

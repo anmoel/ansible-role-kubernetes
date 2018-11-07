@@ -1,0 +1,17 @@
+---
+
+kubernetes_apiserver_ip: 192.168.10.120
+
+keepalived_vrrp_nic: "enp0s8"
+keepalived_sync_groups:
+  haproxy:
+    instances:
+      - internal
+keepalived_instances:
+  internal:
+    interface: "{{ keepalived_vrrp_nic }}"
+    state: "{{ (groups['k8s_masters'].index(inventory_hostname) == 0) | ternary('MASTER','BACKUP') }}"
+    virtual_router_id: 42
+    priority: "{{ (groups['k8s_masters']|length - groups['k8s_masters'].index(inventory_hostname)) * 250 // (groups['k8s_masters']|length) }}"
+    vips:
+      - "{{ kubernetes_apiserver_ip }}/24 dev {{ keepalived_vrrp_nic }}"

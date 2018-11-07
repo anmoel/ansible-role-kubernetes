@@ -1,6 +1,5 @@
 # Ansible Role: Kubernetes
 
-
 An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 
 ## Requirements
