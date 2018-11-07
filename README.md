@@ -5,6 +5,7 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 ## Requirements
 
 Requires Docker; recommended role for Docker installation: `geerlingguy.docker`.
+requires loadbalancer or keepalived for HA; recommended role for keepalived installations: `evrardjp.keepalived`
 
 ## Role Variables
 
@@ -46,34 +47,31 @@ None.
 
 ## Example Playbooks
 
-There are some example szenarios with vagrant boxes.
+There is an Vagrantfile to create all servers for all szenarios:
+[Vagrantfile](./tests/Vagrantfile)
+[servers.yml](./tests/servers.yml) (needed for Vagrantfile)
 
 ### Single Master-Cluster
 
-```bash
-cd ./tests
-vagrant up k8s-master-01 k8s-worker-01
-cd ..
-ansible-playbook -i tests/single_master/inventory tests/single_master/site.yml
-```
+[inventory](./tests/single_master/inventory)
+
+[site.yml](./tests/single_master/site.yml)
 
 ### HA-Master-Cluster
 
-```bash
-cd ./tests
-vagrant up k8s-master-01 k8s-master-02 k8s-master-03 k8s-worker-01
-cd ..
-ansible-playbook -i tests/ha_master/inventory tests/ha_master/site.yml
-```
+[inventory](./tests/master_ha/inventory)
+
+[group_vars/k8s_masters](./tests/master_ha/group_vars/k8s_masters)
+
+[site.yml](./tests/master_ha/site.yml)
 
 ### seperated etcd, HA Master Cluster
 
-```bash
-cd ./tests
-vagrant up etcd-01 etcd-02 etcd-03 k8s-master-01 k8s-master-02 k8s-master-03 k8s-worker-01
-cd ..
-ansible-playbook -i tests/seperated_etcd/inventory tests/seperated_etcd/site.yml
-```
+[inventory](./tests/seperated_etcd/inventory)
+
+[group_vars/k8s_masters](./tests/seperated_etcd/group_vars/k8s_masters)
+
+[site.yml](./tests/seperated_etcd/site.yml)
 
 ## License
 
