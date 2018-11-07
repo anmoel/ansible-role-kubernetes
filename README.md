@@ -30,15 +30,15 @@ Requires Docker; recommended role for Docker installation: `geerlingguy.docker`.
 | kubernetes_pod_subnet | false | "10.244.0.0/16" | ipv4 subnet for pods, must be a cidr |
 | kubernetes_service_subnet | false | "10.96.0.0/16" | ipv4 subnet vor service, must be a cidr |
 | kubernetes_kubelet_extra_args | false | "" | extra arguments for the kubelet daemon |
-| kubernetes_packages| false | `- name: kubelet` | the name of the kubernetes packages,
-| |  |  `  state: present` | where isntalled from package-manager
-| | |  `- name: kubectl` |
-| | |  `  state: present` |
-| | |  `- name: kubeadm` |
-| | |  `  state: present` |
-| | |  `- name: kubernetes-cni` |
-| | |  `  state: present` |
-kubernetes_version_kubeadm | false | 'stable-{{ kubernetes_version }}' | version of kubeadm
+| kubernetes_packages| false | `- name: kubelet` | the name of the kubernetes packages, |
+| | |  `  state: present` | where isntalled from package-manager |
+| | |  `- name: kubectl` | |
+| | |  `  state: present` | |
+| | |  `- name: kubeadm` | |
+| | |  `  state: present` | |
+| | |  `- name: kubernetes-cni` | |
+| | |  `  state: present` | |
+kubernetes_version_kubeadm | false | 'stable-{{ kubernetes_version }}' | version of kubeadm |
 
 ## Dependencies
 
