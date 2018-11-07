@@ -1,0 +1,14 @@
+---
+
+- hosts: k8s_masters
+  become: true
+  become_user: root
+  roles:
+    - evrardjp.keepalived
+
+- hosts: kubernetes
+  become: true
+  become_user: root
+  roles:
+    - geerlingguy.docker
+    - anmoel.kubernetes
