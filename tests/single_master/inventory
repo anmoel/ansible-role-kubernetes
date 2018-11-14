@@ -3,12 +3,14 @@ etcd
 k8s_masters
 k8s_nodes
 
+[kubernetes:vars]
+docker_version="18.06.0"
 
 [etcd]
-k8s-master-01 ansible_ssh_host=192.168.10.121 ansible_user=vagrant
+etcd-01 ansible_ssh_host=192.168.10.110 ansible_user=vagrant
 
 [k8s_masters]
 k8s-master-01 ansible_ssh_host=192.168.10.121 ansible_user=vagrant
 
 [k8s_nodes]
-k8s-worker-01 ansible_ssh_host=192.168.10.130 ansible_user=vagrant
+#k8s-worker-01 ansible_ssh_host=192.168.10.130 ansible_user=vagrant

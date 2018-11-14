@@ -2,7 +2,7 @@
 
 - name: copy kubeadmconf
   copy:
-    src: /etc/kubernetes/kubeadm/kubeadmconf.yaml
+    src: /etc/kubernetes/kubeadm/clusterconfig.yaml
     dest: /etc/kubernetes/kubeadm/kubeadmenvconf.yaml
     remote_src: yes
   changed_when: false

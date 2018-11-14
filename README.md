@@ -43,7 +43,7 @@ kubernetes_version_kubeadm | false | 'stable-{{ kubernetes_version }}' | version
 
 ## Dependencies
 
-None.
+python library docker
 
 ## Example Playbooks
 

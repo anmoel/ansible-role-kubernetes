@@ -23,15 +23,41 @@
     - "{{ etcd_apiserver_certs_register.results }}"
 
 - name: run preflight checks
-  command: kubeadm alpha phase preflight master --config /etc/kubernetes/kubeadm/kubeadmconf.yaml
-  when: inventory_hostname == groups.k8s_masters[0]
+  command: kubeadm alpha phase preflight master --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  when:
+  - inventory_hostname == groups.k8s_masters[0]
+  - inventory_hostname not in groups.etcd
   register: master_preflight_register
   changed_when: false
   failed_when: false
 
+- debug: var=master_preflight_register
+
 - name: initial at first master
-  command: "kubeadm init --config /etc/kubernetes/kubeadm/kubeadmconf.yaml"
-  when: inventory_hostname == groups.k8s_masters[0] and master_preflight_register.rc == 0
+  command: "kubeadm init --config /etc/kubernetes/kubeadm/clusterconfig.yaml"
+  when:
+  - inventory_hostname == groups.k8s_masters[0]
+  - inventory_hostname not in groups.etcd
+  - master_preflight_register.rc == 0
+  register: init_output
+
+- name: run preflight checks
+  command: kubeadm alpha phase preflight master --config /etc/kubernetes/kubeadm/clusterconfig.yaml --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379
+  when:
+  - inventory_hostname == groups.k8s_masters[0]
+  - inventory_hostname in groups.etcd
+  register: master_preflight_register
+  changed_when: false
+  failed_when: false
+
+- debug: var=master_preflight_register
+
+- name: initial at first master with started etcd
+  command: "kubeadm init --config /etc/kubernetes/kubeadm/clusterconfig.yaml --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379"
+  when:
+  - inventory_hostname == groups.k8s_masters[0]
+  - inventory_hostname in groups.etcd
+  - master_preflight_register.rc == 0
   register: init_output
 
 - debug: var=init_output

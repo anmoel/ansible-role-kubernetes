@@ -13,6 +13,15 @@
   when: ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
   register: join_command_register
 
+- name: ensure kubelet systemd service file exists
+  template:
+    src: origin_kubelet.service.d.j2
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  register: kubelet_config_file
+  when:
+    - ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
+    - inventory_hostname in groups.etcd
+
 - name: Ensure kubelet is stopped and enabled at boot.
   service:
     name: kubelet
@@ -21,5 +30,33 @@
   when: ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
 
 - name: join node into cluster
-  command: "{{ join_command_register.stdout }} --ignore-preflight-errors DirAvailable--etc-kubernetes-manifests"
+  command: "{{ join_command_register.stdout }} --ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests"
   when: ( 'node/' + ansible_hostname ) not in get_node_register.stdout_lines
+
+- name: check if taint is set
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.spec.taints}' --kubeconfig /etc/kubernetes/admin.conf
+  register: check_taint_register
+  changed_when: false
+  when: inventory_hostname in groups.etcd
+
+- name: taint etcd node
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  command: kubectl taint node {{ ansible_hostname }} node-role.kubernetes.io/etcd=:NoSchedule --kubeconfig /etc/kubernetes/admin.conf
+  when:
+  - inventory_hostname in groups.etcd
+  - "'node-role.kubernetes.io/etcd' not in check_taint_register.stdout"
+
+- name: check if node role label is set
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.spec.labels}' --kubeconfig /etc/kubernetes/admin.conf
+  register: check_label_register
+  changed_when: false
+  when: inventory_hostname in groups.etcd
+
+- name: label etcd node
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  command: kubectl label node {{ ansible_hostname }} node-role.kubernetes.io/etcd= --kubeconfig /etc/kubernetes/admin.conf
+  when:
+  - inventory_hostname in groups.etcd
+  - "'node-role.kubernetes.io/etcd' not in check_label_register.stdout"

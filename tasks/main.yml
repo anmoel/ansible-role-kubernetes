@@ -23,14 +23,26 @@
     state: directory
     path: /etc/kubernetes/kubeadm
 
-- name: ensure kubeadm config exists
+- name: ensure kubeadm cluster config exists
   template:
-    src: kubeadmconf.yaml.j2
-    dest: /etc/kubernetes/kubeadm/kubeadmconf.yaml
+    src: clusterconfig.yaml.j2
+    dest: /etc/kubernetes/kubeadm/clusterconfig.yaml
+
+- name: ensure kubelet env KUBELET_EXTRA_ARGS is set
+  lineinfile:
+    path: /etc/default/kubelet
+    regexp: '^KUBELET_EXTRA_ARGS.*'
+    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_ssh_host }}"'
 
 - name: include etcd tasks
   include_tasks: etcd.yml
   when: inventory_hostname in groups.etcd
+
+- name: include master with etcd prepare tasks
+  include_tasks: prepare_master_with_etcd.yml
+  when:
+    - inventory_hostname in groups.k8s_masters
+    - inventory_hostname in groups.etcd
 
 - name: include master tasks
   include_tasks: master.yml
@@ -42,11 +54,9 @@
 
 - name: include join worker tasks
   include_tasks: join.yml
-  when:
-    - inventory_hostname not in groups.k8s_masters
-    - inventory_hostname not in groups.etcd
+  when: inventory_hostname not in groups.k8s_masters
 
-- name: include update master tasks
-  include_tasks: update_master.yml
-  when: inventory_hostname in groups.k8s_masters
-  tags: k8s_update
+#- name: include update master tasks
+#  include_tasks: update_master.yml
+#  when: inventory_hostname in groups.k8s_masters
+#  tags: k8s_update

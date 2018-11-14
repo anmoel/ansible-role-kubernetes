@@ -1,0 +1,13 @@
+---
+
+- name: ensure kubelet systemd service file exists
+  template:
+    src: origin_kubelet.service.d.j2
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  register: kubelet_config_file
+
+- name: Ensure kubelet is stopped and enabled at boot.
+  service:
+    name: kubelet
+    state: stopped
+    enabled: true

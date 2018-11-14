@@ -15,12 +15,12 @@
     - /etc/kubernetes/pki/etcd/ca.key
 
 - name: generate etcd-ca cert
-  command: kubeadm alpha phase certs etcd-ca --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase certs etcd-ca --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
   delegate_to: "{{ groups.etcd[0] }}"
   run_once: true
 
-- name: get config files from first etcd node
+- name: get etcd ca files from first etcd node
   delegate_to: "{{ groups.etcd[0] }}"
   slurp:
     src: "{{ item }}"
@@ -30,7 +30,7 @@
   register: etcd_ca_certs_register
   run_once: true
 
-- name: copy config files to etcd replica nodes
+- name: copy ca files to etcd nodes
   copy:
     content: '{{ item.content | b64decode }}'
     dest: "{{ item.source }}"
@@ -45,7 +45,7 @@
     - /etc/kubernetes/pki/etcd/server.key
 
 - name: generate etcd-server cert
-  command: kubeadm alpha phase certs etcd-server --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase certs etcd-server --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_server_result.results[0].stat.exists == False and etcd_server_result.results[1].stat.exists == False"
 
 - name: check /etc/kubernetes/pki/etcd/peer.crt/.key exists
@@ -57,7 +57,7 @@
     - /etc/kubernetes/pki/etcd/peer.key
 
 - name: generate etcd-peer cert
-  command: kubeadm alpha phase certs etcd-peer --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase certs etcd-peer --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_peer_result.results[0].stat.exists == False and etcd_peer_result.results[1].stat.exists == False"
 
 - name: check /etc/kubernetes/pki/etcd/healthcheck-client.crt/.key exists
@@ -69,7 +69,7 @@
     - /etc/kubernetes/pki/etcd/healthcheck-client.key
 
 - name: generate etcd-healthcheck-client cert
-  command: kubeadm alpha phase certs etcd-healthcheck-client --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase certs etcd-healthcheck-client --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_health_result.results[0].stat.exists == False and etcd_health_result.results[1].stat.exists == False"
 
 - name: check /etc/kubernetes/pki/apiserver-etcd-client.crt/.key exists
@@ -81,7 +81,7 @@
     - /etc/kubernetes/pki/apiserver-etcd-client.key
 
 - name: generate etcd-apiserver-etcd-client cert
-  command: kubeadm alpha phase certs apiserver-etcd-client --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase certs apiserver-etcd-client --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
 
 - name: check /etc/kubernetes/manifests/etcd.yaml exists
@@ -90,15 +90,16 @@
   register: stat_result
 
 - name: generate pod manifest file for etcd
-  command: kubeadm alpha phase etcd local --config=/etc/kubernetes/kubeadm/kubeadmconf.yaml
+  command: kubeadm alpha phase etcd local --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "stat_result.stat.exists == False"
   register: etcd_pod_result
 
-- name: ensure kubeadm config exists
+- name: ensure right kubelet systemd file exists
   template:
-    src: kubelet.service.d.j2
+    src: init_etcd_kubelet.service.d.j2
     dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
   register: kubelet_config_file
+  when: "stat_result.stat.exists == False"
 
 - name: Reload systemd unit if args were changed.
   systemd:

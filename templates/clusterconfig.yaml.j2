@@ -25,7 +25,7 @@ etcd:
       initial-cluster: {% for n in groups.etcd %}{{ hostvars[n]['ansible_hostname'] }}=https://{{ hostvars[n]['ansible_ssh_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}
 
       initial-cluster-state: new
-      name: {{ ansible_nodename }}
+      name: {{ ansible_hostname }}
       listen-peer-urls: https://{{ ansible_ssh_host }}:2380
       listen-client-urls: https://{{ ansible_ssh_host }}:2379
       advertise-client-urls: https://{{ ansible_ssh_host }}:2379
@@ -42,7 +42,7 @@ etcd:
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
 apiServerCertSANs:
-- "{{ kubernetes_apiserver_ip }}"
+- "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_ssh_host']) }}"
   {%- if kubernetes_apiserver_dns != "" %}
 - "{{ kubernetes_apiserver_dns }}"
 controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
