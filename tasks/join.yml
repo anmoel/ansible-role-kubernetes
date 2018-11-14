@@ -49,7 +49,7 @@
 
 - name: check if node role label is set
   delegate_to: "{{ groups.k8s_masters[0] }}"
-  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.spec.labels}' --kubeconfig /etc/kubernetes/admin.conf
+  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.metadata.labels}' --kubeconfig /etc/kubernetes/admin.conf
   register: check_label_register
   changed_when: false
   when: inventory_hostname in groups.etcd
