@@ -5,12 +5,12 @@
   slurp:
     src: "{{ item }}"
   with_items:
-    - /etc/kubernetes/pki/ca.crt
-    - /etc/kubernetes/pki/ca.key
-    - /etc/kubernetes/pki/sa.key
-    - /etc/kubernetes/pki/sa.pub
-    - /etc/kubernetes/pki/front-proxy-ca.crt
-    - /etc/kubernetes/pki/front-proxy-ca.key
+    - '{{ kubernetes_certs_dir }}/ca.crt'
+    - '{{ kubernetes_certs_dir }}/ca.key'
+    - '{{ kubernetes_certs_dir }}/sa.key'
+    - '{{ kubernetes_certs_dir }}/sa.pub'
+    - '{{ kubernetes_certs_dir }}/front-proxy-ca.crt'
+    - '{{ kubernetes_certs_dir }}/front-proxy-ca.key'
     - /etc/kubernetes/admin.conf
   register: master_certs_configs_register
 
@@ -25,12 +25,12 @@
     path: "{{ item }}"
   register: master_certs_result
   with_items:
-    - /etc/kubernetes/pki/apiserver-kubelet-client.crt
-    - /etc/kubernetes/pki/apiserver-kubelet-client.key
-    - /etc/kubernetes/pki/apiserver.crt
-    - /etc/kubernetes/pki/apiserver.key
-    - /etc/kubernetes/pki/front-proxy-client.crt
-    - /etc/kubernetes/pki/front-proxy-client.key
+    - '{{ kubernetes_certs_dir }}/apiserver-kubelet-client.crt'
+    - '{{ kubernetes_certs_dir }}/apiserver-kubelet-client.key'
+    - '{{ kubernetes_certs_dir }}/apiserver.crt'
+    - '{{ kubernetes_certs_dir }}/apiserver.key'
+    - '{{ kubernetes_certs_dir }}/front-proxy-client.crt'
+    - '{{ kubernetes_certs_dir }}/front-proxy-client.key'
 
 - name: gen certs on master ha nodes
   command: kubeadm alpha phase certs all --config /etc/kubernetes/kubeadm/clusterconfig.yaml

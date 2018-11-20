@@ -3,15 +3,15 @@
 - name: ensure folder pki/etcd exists
   file:
     state: directory
-    path: /etc/kubernetes/pki/etcd
+    path: '{{ kubernetes_certs_dir }}/etcd'
 
 - name: get apiserver-etcd-client.crt files from first etcd node
   delegate_to: "{{ groups.etcd[0] }}"
   slurp:
     src: "{{ item }}"
   with_items:
-    - /etc/kubernetes/pki/apiserver-etcd-client.crt
-    - /etc/kubernetes/pki/apiserver-etcd-client.key
+    - '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
+    - '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
   register: etcd_apiserver_certs_register
 
 - name: copy etcd cert files to master nodes
