@@ -22,7 +22,8 @@ kubernetes_apiserver_dns: ""
 kubernetes_apiserver_port: "6443"
 kubernetes_imageRepository: "k8s.gcr.io"
 kubernetes_master_version: "v1.12.0"
-kubernetes_certs_dir: "/etc/kubernetes/pki"
+kubernetes_config_dir: /etc/kubernetes
+kubernetes_certs_dir: "{{ kubernetes_config_dir }}/pki"
 kubernetes_cluster_name: "kubernetes"
 kubernetes_log_dir: "/var/log/kubernetes/audit"
 kubernetes_log_age: 2
