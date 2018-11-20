@@ -76,3 +76,14 @@ networking:
   serviceSubnet: {{ kubernetes_service_subnet }}
 
 {% endif %}
+
+{% if kubernetes_cloud_provider != "" %}
+---
+
+apiVersion: kubeadm.k8s.io/v1alpha3
+kind: InitConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    cloud-provider: "{{ kubernetes_cloud_provider }}"
+    cloud-config: "{{ kubernetes_cloud_config_file }}"
+{% endif %}
