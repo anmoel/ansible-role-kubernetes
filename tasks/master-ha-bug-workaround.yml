@@ -2,18 +2,18 @@
 
 - name: copy kubeadmconf
   copy:
-    src: /etc/kubernetes/kubeadm/clusterconfig.yaml
-    dest: /etc/kubernetes/kubeadm/kubeadmenvconf.yaml
+    src: '{{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml'
+    dest: '{{ kubernetes_config_dir }}/kubeadm/kubeadmenvconf.yaml'
     remote_src: yes
   changed_when: false
 
 - name: replace cluster-config with initial config
   lineinfile:
-    path: /etc/kubernetes/kubeadm/kubeadmenvconf.yaml
+    path: '{{ kubernetes_config_dir }}/kubeadm/kubeadmenvconf.yaml'
     regexp: '^kind: '
     line: 'kind: InitConfiguration'
   changed_when: false
 
 - name: write kubelet env on master ha nodes
-  command: kubeadm alpha phase kubelet write-env-file --config /etc/kubernetes/kubeadm/kubeadmenvconf.yaml
+  command: kubeadm alpha phase kubelet write-env-file --config {{ kubernetes_config_dir }}/kubeadm/kubeadmenvconf.yaml
   changed_when: false

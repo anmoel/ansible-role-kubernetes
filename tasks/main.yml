@@ -21,12 +21,12 @@
 - name: ensure folder kubeadm exists
   file:
     state: directory
-    path: /etc/kubernetes/kubeadm
+    path: '{{ kubernetes_config_dir }}/kubeadm'
 
 - name: ensure kubeadm cluster config exists
   template:
     src: clusterconfig.yaml.j2
-    dest: /etc/kubernetes/kubeadm/clusterconfig.yaml
+    dest: '{{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml'
 
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:
