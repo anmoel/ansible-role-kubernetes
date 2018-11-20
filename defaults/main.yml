@@ -54,3 +54,14 @@ kubernetes_etcd_healthcheck_client_cert_file: '{{ kubernetes_etcd_certs_dir }}/h
 kubernetes_etcd_healthcheck_client_key_file: '{{ kubernetes_etcd_certs_dir }}/healthcheck-client.key'
 kubernetes_etcd_apiserver_client_cert_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
 kubernetes_etcd_apiserver_client_key_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
+
+# cloud provider vars
+kubernetes_cloud_provider: ""
+kubernetes_cloud_config_file: "{{ kubernetes_config_dir }}/{{ kubernetes_cloud_provider }}.conf"
+kubernetes_cloud_vsphere_workspace_server: ""
+kubernetes_cloud_vsphere_workspace_datacenter: ""
+kubernetes_cloud_vsphere_workspace_default_datastore: ""
+kubernetes_cloud_vsphere_workspace_folder: ""
+kubernetes_cloud_vsphere_datacenters: []
+kubernetes_cloud_vsphere_network_options: []
+kubernetes_cloud_vsphere_disk_options: []

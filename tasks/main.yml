@@ -28,6 +28,12 @@
     src: clusterconfig.yaml.j2
     dest: /etc/kubernetes/kubeadm/clusterconfig.yaml
 
+- name: ensure cloud provicer conf exists
+  template:
+    src: cloud.conf.j2
+    dest: "{{ kubernetes_cloud_config_file }}"
+  when: kubernetes_cloud_provider != ""
+
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:
     path: /etc/default/kubelet

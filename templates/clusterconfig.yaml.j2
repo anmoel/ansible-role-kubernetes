@@ -54,8 +54,25 @@ controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_
 apiServerExtraArgs:
   authorization-mode: {{ kubernetes_authorization_mode }}
   enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
+{% if kubernetes_cloud_provider != "" %}
+  cloud-provider: "{{ kubernetes_cloud_provider }}"
+  cloud-config: "{{ kubernetes_cloud_config_file }}"
+apiServerExtraVolumes:
+- name: cloud
+  hostPath: "{{ kubernetes_cloud_config_file }}"
+  mountPath: "{{ kubernetes_cloud_config_file }}"
+controllerManagerExtraArgs:
+  cloud-provider: "{{ kubernetes_cloud_provider }}"
+  cloud-config: "{{ kubernetes_cloud_config_file }}"
+controllerManagerExtraVolumes:
+- name: cloud
+  hostPath: "{{ kubernetes_cloud_config_file }}"
+  mountPath: "{{ kubernetes_cloud_config_file }}"
+{%- endif %}
+
 networking:
   dnsDomain: {{ kubernetes_dns_domain }}
   podSubnet: {{ kubernetes_pod_subnet }}
   serviceSubnet: {{ kubernetes_service_subnet }}
+
 {% endif %}

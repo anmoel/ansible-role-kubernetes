@@ -1,0 +1,28 @@
+{% if kubernetes_cloud_provider == "vsphere" %}
+[Global]
+insecure-flag = 1
+port = 443
+secret-name = "{{kubernetes_cloud_provider}}-secret"
+secret-namespace = "kube-system"
+
+{% for dc in kubernetes_cloud_vsphere_datacenters %}
+[VirtualCenter "{{dc.server}}"]
+datacenters = "{{dc.datacenters}}"
+{% endfor %}
+
+[Workspace]
+server = {{ kubernetes_cloud_vsphere_workspace_server }}
+datacenter = {{ kubernetes_cloud_vsphere_workspace_datacenter }}
+default-datastore = {{ kubernetes_cloud_vsphere_workspace_default_datastore }}
+folder = {{ kubernetes_cloud_vsphere_workspace_folder }}
+
+[Disk]
+{% for do in kubernetes_cloud_vsphere_disk_options %}
+{{ do }}
+{% endfor %}
+
+[Network]
+{% for no in kubernetes_cloud_vsphere_network_options %}
+{{ no }}
+{% endfor %}
+{%- endif %}
