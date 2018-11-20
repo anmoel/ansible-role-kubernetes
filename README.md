@@ -78,6 +78,10 @@ There is an Vagrantfile to create all servers for all szenarios:
 
 Apache 2.0
 
+## contributors
+
+ - [Thomas Krahn](https://github.com/Nosmoht)
+
 ## Author Information
 
 created in 2018 by [André Möller](http://www.andre-moeller.eu/)
