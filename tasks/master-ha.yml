@@ -11,7 +11,7 @@
     - '{{ kubernetes_certs_dir }}/sa.pub'
     - '{{ kubernetes_certs_dir }}/front-proxy-ca.crt'
     - '{{ kubernetes_certs_dir }}/front-proxy-ca.key'
-    - /etc/kubernetes/admin.conf
+    - '{{ kubernetes_config_dir }}/admin.conf'
   register: master_certs_configs_register
 
 - name: copy config files to all masters
@@ -33,7 +33,7 @@
     - '{{ kubernetes_certs_dir }}/front-proxy-client.key'
 
 - name: gen certs on master ha nodes
-  command: kubeadm alpha phase certs all --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: (
     master_certs_result.results[0].stat.exists == False or
     master_certs_result.results[1].stat.exists == False or
@@ -43,17 +43,17 @@
     master_certs_result.results[5].stat.exists == False )
 
 - name: write kubelet config on master ha nodes
-  command: kubeadm alpha phase kubelet config write-to-disk --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubelet config write-to-disk --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   changed_when: false
 
 #- name: write kubelet env on master ha nodes
-#  command: kubeadm alpha phase kubelet write-env-file --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+#  command: kubeadm alpha phase kubelet write-env-file --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
 #  changed_when: false
 - name: incluse bug work around
   include: master-ha-bug-workaround.yml
 
 - name: write kubelet systemd file on master ha nodes
-  command: kubeadm alpha phase kubeconfig kubelet --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubeconfig kubelet --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   changed_when: false
 
 - name: Ensure kubelet is started and enabled at boot.
@@ -67,13 +67,13 @@
     path: "{{ item }}"
   register: master_conf_result
   with_items:
-    - /etc/kubernetes/admin.conf
-    - /etc/kubernetes/controller-manager.conf
-    - /etc/kubernetes/kubelet.conf
-    - /etc/kubernetes/scheduler.conf
+    - '{{ kubernetes_config_dir }}/admin.conf'
+    - '{{ kubernetes_config_dir }}/controller-manager.conf'
+    - '{{ kubernetes_config_dir }}/kubelet.conf'
+    - '{{ kubernetes_config_dir }}/scheduler.conf'
 
 - name: write kubeconfig files for control-plane on master ha nodes
-  command: kubeadm alpha phase kubeconfig all --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubeconfig all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: (
     master_conf_result.results[0].stat.exists == False or
     master_conf_result.results[1].stat.exists == False or
@@ -85,21 +85,21 @@
     path: "{{ item }}"
   register: master_manifest_result
   with_items:
-    - /etc/kubernetes/manifests/kube-apiserver.yaml
-    - /etc/kubernetes/manifests/kube-controller-manager.yaml
-    - /etc/kubernetes/manifests/kube-scheduler.yaml
+    - '{{ kubernetes_config_dir }}/manifests/kube-apiserver.yaml'
+    - '{{ kubernetes_config_dir }}/manifests/kube-controller-manager.yaml'
+    - '{{ kubernetes_config_dir }}/manifests/kube-scheduler.yaml'
 
 - name: write controle-plane manifests on master ha nodes
-  command: kubeadm alpha phase controlplane all --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase controlplane all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: (
     master_manifest_result.results[0].stat.exists == False or
     master_manifest_result.results[1].stat.exists == False or
     master_manifest_result.results[2].stat.exists == False )
 
 - name: annotate cri on master ha nodes
-  command: kubeadm alpha phase kubelet config annotate-cri --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubelet config annotate-cri --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   changed_when: false
 
 - name: mark as master on master ha nodes
-  command: kubeadm alpha phase mark-master --config /etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase mark-master --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   changed_when: false

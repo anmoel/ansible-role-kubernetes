@@ -15,7 +15,7 @@
     - '{{ kubernetes_etcd_ca_key_file }}'
 
 - name: generate etcd-ca cert
-  command: kubeadm alpha phase certs etcd-ca --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs etcd-ca --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
   delegate_to: "{{ groups.etcd[0] }}"
   run_once: true
@@ -45,7 +45,7 @@
     - '{{ kubernetes_etcd_server_key_file }}'
 
 - name: generate etcd-server cert
-  command: kubeadm alpha phase certs etcd-server --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs etcd-server --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "etcd_server_result.results[0].stat.exists == False and etcd_server_result.results[1].stat.exists == False"
 
 - name: 'check {{ kubernetes_etcd_peer_cert_file }} / {{ kubernetes_etcd_peer_key_file }} exists'
@@ -57,7 +57,7 @@
     - '{{ kubernetes_etcd_peer_key_file }}'
 
 - name: generate etcd-peer cert
-  command: kubeadm alpha phase certs etcd-peer --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs etcd-peer --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "etcd_peer_result.results[0].stat.exists == False and etcd_peer_result.results[1].stat.exists == False"
 
 - name: 'check {{ kubernetes_etcd_healthcheck_client_cert_file }} / {{ kubernetes_etcd_healthcheck_client_key_file }} exists'
@@ -69,7 +69,7 @@
     - '{{ kubernetes_etcd_healthcheck_client_key_file }}'
 
 - name: generate etcd-healthcheck-client cert
-  command: kubeadm alpha phase certs etcd-healthcheck-client --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs etcd-healthcheck-client --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "etcd_health_result.results[0].stat.exists == False and etcd_health_result.results[1].stat.exists == False"
 
 - name: 'check {{ kubernetes_etcd_apiserver_client_cert_file }} / {{ kubernetes_etcd_apiserver_client_key_file }} exists'
@@ -81,16 +81,16 @@
     - '{{ kubernetes_etcd_apiserver_client_key_file }}'
 
 - name: generate etcd-apiserver-etcd-client cert
-  command: kubeadm alpha phase certs apiserver-etcd-client --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs apiserver-etcd-client --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
 
-- name: check /etc/kubernetes/manifests/etcd.yaml exists
+- name: check {{ kubernetes_config_dir }}/manifests/etcd.yaml exists
   stat:
-    path: /etc/kubernetes/manifests/etcd.yaml
+    path: '{{ kubernetes_config_dir }}/manifests/etcd.yaml'
   register: stat_result
 
 - name: generate pod manifest file for etcd
-  command: kubeadm alpha phase etcd local --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase etcd local --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "stat_result.stat.exists == False"
   register: etcd_pod_result
 
@@ -126,6 +126,6 @@
     cleanup: yes
     detach: no
     volumes:
-      - /etc/kubernetes:/etc/kubernetes
+      - '{{ kubernetes_config_dir }}:/etc/kubernetes'
     command: "etcdctl --cert-file {{ kubernetes_etcd_peer_cert_file }} --key-file {{ kubernetes_etcd_peer_key_file }} --ca-file {{ kubernetes_etcd_ca_cert_file }} --endpoints https://{{ ansible_ssh_host }}:2379 cluster-health"
   changed_when: False
