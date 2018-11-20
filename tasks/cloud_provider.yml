@@ -1,7 +1,28 @@
 ---
 
+- name: create temporary file for cloud_secret
+  tempfile:
+    state: file
+    suffix: temp
+  register: cloud_secret_tempfile_register
+  changed_when: false
+
+- debug: var=cloud_secret_tempfile_register
+
+- name: ensure kubeadm cluster config exists
+  template:
+    src: cloud-secret.yaml.j2
+    dest: '{{ cloud_secret_tempfile_register.path }}'
+  changed_when: false
+
 - name: "deploy vsphere cloud provider secret"
-  command: "kubectl -n kube-system create secret generic {{ kubernetes_cloud_provider }}-secret {{ item }}"
-  with_items:
-    - "{% for dc in kubernetes_cloud_vsphere_datacenters %}  --from-literal={{ dc.server }}.username={{ dc.username }} --from-literal={{dc.server}}.password={{ dc.password }}{% endfor %}"
+  command: "kubectl -n kube-system apply -f {{ cloud_secret_tempfile_register.path }}"
   when: kubernetes_cloud_provider == "vsphere"
+  register: vsphere_secret_register
+  changed_when: vsphere_secret_register.stdout is search("created")
+
+- name: remove temporary file
+  file:
+    state: absent
+    path: "{{ cloud_secret_tempfile_register.path }}"
+  changed_when: false
