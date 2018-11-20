@@ -2,7 +2,7 @@
 
 - name: check node is already in cluster
   delegate_to: "{{ groups.k8s_masters[0] }}"
-  command: "kubectl get nodes -n kube-system --kubeconfig /etc/kubernetes/admin.conf -o name"
+  command: "kubectl get nodes -n kube-system --kubeconfig {{ kubernetes_config_dir }}/admin.conf -o name"
   register: get_node_register
   changed_when: false
 
@@ -35,28 +35,28 @@
 
 - name: check if taint is set
   delegate_to: "{{ groups.k8s_masters[0] }}"
-  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.spec.taints}' --kubeconfig /etc/kubernetes/admin.conf
+  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.spec.taints}' --kubeconfig {{ kubernetes_config_dir }}/admin.conf
   register: check_taint_register
   changed_when: false
   when: inventory_hostname in groups.etcd
 
 - name: taint etcd node
   delegate_to: "{{ groups.k8s_masters[0] }}"
-  command: kubectl taint node {{ ansible_hostname }} node-role.kubernetes.io/etcd=:NoSchedule --kubeconfig /etc/kubernetes/admin.conf
+  command: kubectl taint node {{ ansible_hostname }} node-role.kubernetes.io/etcd=:NoSchedule --kubeconfig {{ kubernetes_config_dir }}/admin.conf
   when:
   - inventory_hostname in groups.etcd
   - "'node-role.kubernetes.io/etcd' not in check_taint_register.stdout"
 
 - name: check if node role label is set
   delegate_to: "{{ groups.k8s_masters[0] }}"
-  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.metadata.labels}' --kubeconfig /etc/kubernetes/admin.conf
+  command: kubectl get node {{ ansible_hostname }} -o jsonpath='{.metadata.labels}' --kubeconfig {{ kubernetes_config_dir }}/admin.conf
   register: check_label_register
   changed_when: false
   when: inventory_hostname in groups.etcd
 
 - name: label etcd node
   delegate_to: "{{ groups.k8s_masters[0] }}"
-  command: kubectl label node {{ ansible_hostname }} node-role.kubernetes.io/etcd= --kubeconfig /etc/kubernetes/admin.conf
+  command: kubectl label node {{ ansible_hostname }} node-role.kubernetes.io/etcd= --kubeconfig {{ kubernetes_config_dir }}/admin.conf
   when:
   - inventory_hostname in groups.etcd
   - "'node-role.kubernetes.io/etcd' not in check_label_register.stdout"
