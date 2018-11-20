@@ -1,0 +1,7 @@
+---
+
+- name: "deploy vsphere cloud provider secret"
+  command: "kubectl -n kube-system create secret generic {{ kubernetes_cloud_provider }}-secret {{ item }}"
+  with_items:
+    - "{% for dc in kubernetes_cloud_vsphere_datacenters %}  --from-literal={{ dc.server }}.username={{ dc.username }} --from-literal={{dc.server}}.password={{ dc.password }}{% endfor %}"
+  when: kubernetes_cloud_provider == "vsphere"
