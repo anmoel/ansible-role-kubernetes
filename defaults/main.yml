@@ -41,3 +41,16 @@ kubernetes_kubelet_extra_args: ""
 # kubeadm vars
 kubernetes_enable_web_ui: true
 kubernetes_version_kubeadm: 'stable-{{ kubernetes_version }}'
+
+# Etcd vars
+kubernetes_etcd_certs_dir: '{{ kubernetes_certs_dir }}/etcd'
+kubernetes_etcd_ca_cert_file: '{{ kubernetes_etcd_certs_dir }}/ca.crt'
+kubernetes_etcd_ca_key_file: '{{ kubernetes_etcd_certs_dir }}/ca.key'
+kubernetes_etcd_server_cert_file: '{{ kubernetes_etcd_certs_dir }}/server.crt'
+kubernetes_etcd_server_key_file: '{{ kubernetes_etcd_certs_dir }}/server.key'
+kubernetes_etcd_peer_cert_file: '{{ kubernetes_etcd_certs_dir }}/peer.crt'
+kubernetes_etcd_peer_key_file: '{{ kubernetes_etcd_certs_dir }}/peer.key'
+kubernetes_etcd_healthcheck_client_cert_file: '{{ kubernetes_etcd_certs_dir }}/healthcheck-client.crt'
+kubernetes_etcd_healthcheck_client_key_file: '{{ kubernetes_etcd_certs_dir }}/healthcheck-client.key'
+kubernetes_etcd_apiserver_client_cert_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
+kubernetes_etcd_apiserver_client_key_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'

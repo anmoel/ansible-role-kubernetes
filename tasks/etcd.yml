@@ -1,18 +1,18 @@
 ---
 
-- name: ensure folder pki/etcd exists
+- name: '{{ kubernetes_etcd_certs_dir }}'
   file:
     state: directory
-    path: '{{ kubernetes_certs_dir }}/etcd'
+    path: '{{ kubernetes_etcd_certs_dir }}'
 
-- name: 'check {{ kubernetes_certs_dir }}/etcd/ca.crt / ca.key exists'
+- name: 'check {{ kubernetes_etcd_ca_cert_file }} / {{ kubernetes_etcd_ca_key_file }} exists'
   stat:
     path: "{{ item }}"
   register: etcd_ca_result
   when: "inventory_hostname == groups.etcd[0]"
   with_items:
-    - '{{ kubernetes_certs_dir }}/etcd/ca.crt'
-    - '{{ kubernetes_certs_dir }}/etcd/ca.key'
+    - '{{ kubernetes_etcd_ca_cert_file }}'
+    - '{{ kubernetes_etcd_ca_key_file }}'
 
 - name: generate etcd-ca cert
   command: kubeadm alpha phase certs etcd-ca --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
@@ -25,8 +25,8 @@
   slurp:
     src: "{{ item }}"
   with_items:
-    - '{{ kubernetes_certs_dir }}/etcd/ca.crt'
-    - '{{ kubernetes_certs_dir }}/etcd/ca.key'
+    - '{{ kubernetes_etcd_ca_cert_file }}'
+    - '{{ kubernetes_etcd_ca_key_file }}'
   register: etcd_ca_certs_register
   run_once: true
 
@@ -36,49 +36,49 @@
     dest: "{{ item.source }}"
   with_items: "{{ etcd_ca_certs_register.results }}"
 
-- name: 'check {{ kubernetes_certs_dir }}/etcd/server.crt/.key exists'
+- name: 'check {{ kubernetes_etcd_server_cert_file }} / {{ kubernetes_etcd_server_key_file }} exists'
   stat:
     path: "{{ item }}"
   register: etcd_server_result
   with_items:
-    - '{{ kubernetes_certs_dir }}/etcd/server.crt'
-    - '{{ kubernetes_certs_dir }}/etcd/server.key'
+    - '{{ kubernetes_etcd_server_cert_file }}'
+    - '{{ kubernetes_etcd_server_key_file }}'
 
 - name: generate etcd-server cert
   command: kubeadm alpha phase certs etcd-server --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_server_result.results[0].stat.exists == False and etcd_server_result.results[1].stat.exists == False"
 
-- name: 'check {{ kubernetes_certs_dir }}/etcd/peer.crt/.key exists'
+- name: 'check {{ kubernetes_etcd_peer_cert_file }} / {{ kubernetes_etcd_peer_key_file }} exists'
   stat:
     path: "{{ item }}"
   register: etcd_peer_result
   with_items:
-    - '{{ kubernetes_certs_dir }}/etcd/peer.crt'
-    - '{{ kubernetes_certs_dir }}/etcd/peer.key'
+    - '{{ kubernetes_etcd_peer_cert_file }}'
+    - '{{ kubernetes_etcd_peer_key_file }}'
 
 - name: generate etcd-peer cert
   command: kubeadm alpha phase certs etcd-peer --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_peer_result.results[0].stat.exists == False and etcd_peer_result.results[1].stat.exists == False"
 
-- name: 'check {{ kubernetes_certs_dir }}/etcd/healthcheck-client.crt/.key exists'
+- name: 'check {{ kubernetes_etcd_healthcheck_client_cert_file }} / {{ kubernetes_etcd_healthcheck_client_key_file }} exists'
   stat:
     path: "{{ item }}"
   register: etcd_health_result
   with_items:
-    - '{{ kubernetes_certs_dir }}/etcd/healthcheck-client.crt'
-    - '{{ kubernetes_certs_dir }}/etcd/healthcheck-client.key'
+    - '{{ kubernetes_etcd_healthcheck_client_cert_file }}'
+    - '{{ kubernetes_etcd_healthcheck_client_key_file }}'
 
 - name: generate etcd-healthcheck-client cert
   command: kubeadm alpha phase certs etcd-healthcheck-client --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
   when: "etcd_health_result.results[0].stat.exists == False and etcd_health_result.results[1].stat.exists == False"
 
-- name: 'check {{ kubernetes_certs_dir }}/apiserver-etcd-client.crt/.key exists'
+- name: 'check {{ kubernetes_etcd_apiserver_client_cert_file }} / {{ kubernetes_etcd_apiserver_client_key_file }} exists'
   stat:
     path: "{{ item }}"
   register: etcd_apiclient_result
   with_items:
-    - '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
-    - '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
+    - '{{ kubernetes_etcd_apiserver_client_cert_file }}'
+    - '{{ kubernetes_etcd_apiserver_client_key_file }}'
 
 - name: generate etcd-apiserver-etcd-client cert
   command: kubeadm alpha phase certs apiserver-etcd-client --config=/etc/kubernetes/kubeadm/clusterconfig.yaml
@@ -127,5 +127,5 @@
     detach: no
     volumes:
       - /etc/kubernetes:/etc/kubernetes
-    command: "etcdctl --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --ca-file {{ kubernetes_certs_dir }}/etcd/ca.crt --endpoints https://{{ ansible_ssh_host }}:2379 cluster-health"
+    command: "etcdctl --cert-file {{ kubernetes_etcd_peer_cert_file }} --key-file {{ kubernetes_etcd_peer_key_file }} --ca-file {{ kubernetes_etcd_ca_cert_file }} --endpoints https://{{ ansible_ssh_host }}:2379 cluster-health"
   changed_when: False

@@ -36,9 +36,9 @@ etcd:
 {% for n in groups.etcd %}
     - "https://{{ hostvars[n]['ansible_ssh_host'] }}:2379"
 {% endfor %}
-    caFile: {{ kubernetes_certs_dir }}/etcd/ca.crt
-    certFile: {{ kubernetes_certs_dir }}/apiserver-etcd-client.crt
-    keyFile: {{ kubernetes_certs_dir }}/apiserver-etcd-client.key
+    caFile: {{ kubernetes_etcd_ca_cert_file }}
+    certFile: {{ kubernetes_etcd_apiserver_client_cert_file }}
+    keyFile: {{ kubernetes_etcd_apiserver_client_key_file }}
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
 apiServerCertSANs:
