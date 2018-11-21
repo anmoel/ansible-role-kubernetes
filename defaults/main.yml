@@ -55,3 +55,4 @@ kubernetes_etcd_healthcheck_client_cert_file: '{{ kubernetes_etcd_certs_dir }}/h
 kubernetes_etcd_healthcheck_client_key_file: '{{ kubernetes_etcd_certs_dir }}/healthcheck-client.key'
 kubernetes_etcd_apiserver_client_cert_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
 kubernetes_etcd_apiserver_client_key_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
+kubernetes_etcd_manifest_file: '{{ kubernetes_pod_manifest_path }}/etcd.yaml'
