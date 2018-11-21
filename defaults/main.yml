@@ -59,3 +59,6 @@ kubernetes_etcd_manifest_file: '{{ kubernetes_pod_manifest_path }}/etcd.yaml'
 
 # API server
 kubernetes_apiserver_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'
+
+# Controller Manager
+kubernetes_controller_manager_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'
