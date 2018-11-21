@@ -13,28 +13,22 @@ etcd:
   local:
     dataDir: {{ kubernetes_etcd_data_dir }}
     image: {{ kubernetes_etcd_image }}
-    serverCertSANs:
-    - "{{ ansible_hostname }}"
-    - "{{ ansible_nodename }}"
-    - "{{ ansible_ssh_host }}"
-    peerCertSANs:
-    - "{{ ansible_hostname }}"
-    - "{{ ansible_nodename }}"
-    - "{{ ansible_ssh_host }}"
+    serverCertSANs: {{ kubernetes_etcd_server_cert_sans }}
+    peerCertSANs: {{ kubernetes_etcd_peer_cert_sans }}
     extraArgs:
-      initial-cluster: {% for n in groups.etcd %}{{ hostvars[n]['ansible_hostname'] }}=https://{{ hostvars[n]['ansible_ssh_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}
+      initial-cluster: {{ kubernetes_etcd_initial_cluster }}
 
       initial-cluster-state: new
       name: {{ ansible_hostname }}
-      listen-peer-urls: https://{{ ansible_ssh_host }}:2380
-      listen-client-urls: https://{{ ansible_ssh_host }}:2379
-      advertise-client-urls: https://{{ ansible_ssh_host }}:2379
-      initial-advertise-peer-urls: https://{{ ansible_ssh_host }}:2380
+      listen-peer-urls: {{ kubernetes_etcd_listen_peer_urls }}
+      listen-client-urls: {{ kubernetes_etcd_listen_client_urls }}
+      advertise-client-urls: {{ kubernetes_etcd_advertise_client_urls }}
+      initial-advertise-peer-urls: {{ kubernetes_etcd_initial_advertise_peer_urls }}
 {% else %}
   external:
     endpoints:
 {% for n in groups.etcd %}
-    - "https://{{ hostvars[n]['ansible_ssh_host'] }}:2379"
+    - "https://{{ hostvars[n]['ansible_ssh_host'] }}:{{ kubernetes_etcd_client_port }}"
 {% endfor %}
     caFile: {{ kubernetes_etcd_ca_cert_file }}
     certFile: {{ kubernetes_etcd_apiserver_client_cert_file }}

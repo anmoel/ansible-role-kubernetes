@@ -77,7 +77,6 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_apiserver_port | false | `6443` | port of kubernetes apiserver |
 | kubernetes_apiserver_manifest_file | false | `'{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'` | Absolute path to manifest file |
 
-
 ## Etcd
 
 | Name | Description | Default |
@@ -96,6 +95,8 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_etcd_manifest_file | | `'{{ kubernetes_pod_manifest_path }}/etcd.yaml'` |
 | kubernetes_etcd_data_dir | folder for etcd data | `/var/etcd` |  |
 | kubernetes_etcd_image | image name for own etcd-container |  |
+| kubernetes_etcd_server_port | Etcd server communication port |  `2380` |
+| kubernetes_etcd_client_port | Etcd client communication port | `2379` |
 
 ## Controller Manager
 

@@ -54,6 +54,21 @@ kubernetes_etcd_healthcheck_client_key_file: '{{ kubernetes_etcd_certs_dir }}/he
 kubernetes_etcd_apiserver_client_cert_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
 kubernetes_etcd_apiserver_client_key_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
 kubernetes_etcd_manifest_file: '{{ kubernetes_pod_manifest_path }}/etcd.yaml'
+kubernetes_etcd_server_cert_sans:
+- "{{ ansible_hostname }}"
+- "{{ ansible_nodename }}"
+- "{{ ansible_ssh_host }}"
+kubernetes_etcd_peer_cert_sans:
+- "{{ ansible_hostname }}"
+- "{{ ansible_nodename }}"
+- "{{ ansible_ssh_host }}"
+kubernetes_etcd_server_port: 2380
+kubernetes_etcd_client_port: 2379
+kubernetes_etcd_advertise_client_urls: 'https://{{ ansible_ssh_host }}:{{ kubernetes_etcd_client_port }}'
+kubernetes_etcd_initial_cluster: "{% for n in groups.etcd %}{{ hostvars[n]['ansible_hostname'] }}=https://{{ hostvars[n]['ansible_ssh_host'] }}:{{ kubernetes_etcd_server_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+kubernetes_etcd_initial_advertise_peer_urls: 'https://{{ ansible_ssh_host }}:{{ kubernetes_etcd_server_port }}'
+kubernetes_etcd_listen_peer_urls: 'https://{{ ansible_ssh_host }}:{{ kubernetes_etcd_server_port }}'
+kubernetes_etcd_listen_client_urls: 'https://{{ ansible_ssh_host }}:{{ kubernetes_etcd_client_port }}'
 
 # API server
 kubernetes_apiserver_dns: ""
