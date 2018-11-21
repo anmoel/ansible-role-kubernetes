@@ -117,7 +117,7 @@
 - name: wait for etcd-cluster
   wait_for:
     host: '{{ ansible_ssh_host }}'
-    port: 2379
+    port: '{{ kubernetes_etcd_client_port }}'
 
 - name: test etcd cluster
   docker_container:
@@ -127,5 +127,5 @@
     detach: no
     volumes:
       - '{{ kubernetes_config_dir }}:/etc/kubernetes'
-    command: "etcdctl --cert-file {{ kubernetes_etcd_peer_cert_file }} --key-file {{ kubernetes_etcd_peer_key_file }} --ca-file {{ kubernetes_etcd_ca_cert_file }} --endpoints https://{{ ansible_ssh_host }}:2379 cluster-health"
+    command: "etcdctl --cert-file {{ kubernetes_etcd_peer_cert_file }} --key-file {{ kubernetes_etcd_peer_key_file }} --ca-file {{ kubernetes_etcd_ca_cert_file }} --endpoints https://{{ ansible_ssh_host }}:{{ kubernetes_etcd_client_port }} cluster-health"
   changed_when: False
