@@ -87,7 +87,7 @@
   with_items:
     - '{{ kubernetes_apiserver_manifest_file }}'
     - '{{ kubernetes_controller_manager_manifest_file }}'
-    - '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
+    - '{{ kubernetes_scheduler_manifest_file }}'
 
 - name: write controle-plane manifests on master ha nodes
   command: kubeadm alpha phase controlplane all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml

@@ -62,3 +62,6 @@ kubernetes_apiserver_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-api
 
 # Controller Manager
 kubernetes_controller_manager_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'
+
+# Scheduler
+kubernetes_scheduler_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
