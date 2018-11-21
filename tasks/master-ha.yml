@@ -85,7 +85,7 @@
     path: "{{ item }}"
   register: master_manifest_result
   with_items:
-    - '{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'
+    - '{{ kubernetes_apiserver_manifest_file }}'
     - '{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'
     - '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
 
