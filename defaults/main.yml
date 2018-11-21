@@ -99,6 +99,8 @@ kubernetes_cloud_vsphere_workspace_server: ""
 kubernetes_cloud_vsphere_workspace_datacenter: ""
 kubernetes_cloud_vsphere_workspace_default_datastore: ""
 kubernetes_cloud_vsphere_workspace_folder: ""
+kubernetes_cloud_vsphere_workspace_user: ""
+kubernetes_cloud_vsphere_workspace_password: ""
 kubernetes_cloud_vsphere_datacenters: []
 kubernetes_cloud_vsphere_network_options: []
 kubernetes_cloud_vsphere_disk_options: []
