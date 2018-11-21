@@ -11,6 +11,7 @@ Ansible Role: Kubernetes
 	- [API server](#api-server)
 	- [Etcd](#etcd)
 	- [Controller Manager](#controller-manager)
+	- [kubeadm](#kubeadm)
 	- [Scheduler](#scheduler)
 - [Example Playbooks](#example-playbooks)
 	- [Single Master-Cluster](#single-master-cluster)
@@ -103,6 +104,13 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | Name | Description | Default |
 | --- | --- | --- |
 | kubernetes_controller_manager_manifest_file | Absolute path to manifest file | `'{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'`  |
+
+## kubeadm
+
+| Name | Description | Default |
+| --- | --- | --- |
+| kubernetes_kubeadm_config_file_path | Path to store kubeadm config file | `'{{ kubernetes_config_dir }}/kubeadm'` |
+| kubernetes_kubeadm_config_file_name | Name of kubeadm config file | `clusterconfig.yaml` |
 
 ## Scheduler
 

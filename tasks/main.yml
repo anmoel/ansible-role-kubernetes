@@ -18,15 +18,15 @@
 - name: include install tasks
   import_tasks: install.yml
 
-- name: ensure folder kubeadm exists
+- name: '{{ kubernetes_kubeadm_config_file_path }}'
   file:
     state: directory
-    path: '{{ kubernetes_config_dir }}/kubeadm'
+    path: '{{ kubernetes_kubeadm_config_file_path }}'
 
-- name: ensure kubeadm cluster config exists
+- name: '{{ kubernetes_kubeadm_config_file }}'
   template:
     src: clusterconfig.yaml.j2
-    dest: '{{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml'
+    dest: '{{ kubernetes_kubeadm_config_file }}'
 
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:

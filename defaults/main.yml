@@ -80,3 +80,8 @@ kubernetes_controller_manager_manifest_file: '{{ kubernetes_pod_manifest_path }}
 
 # Scheduler
 kubernetes_scheduler_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
+
+# kubeadm
+kubernetes_kubeadm_config_file_path: '{{ kubernetes_config_dir }}/kubeadm'
+kubernetes_kubeadm_config_file_name: clusterconfig.yaml
+kubernetes_kubeadm_config_file: '{{ kubernetes_kubeadm_config_file_path }}/{{ kubernetes_kubeadm_config_file_name }}'
