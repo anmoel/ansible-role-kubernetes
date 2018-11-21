@@ -30,9 +30,9 @@
 
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:
-    path: /etc/default/kubelet
+    path: '{{ kubernetes_kubelet_environment_file }}'
     regexp: '^KUBELET_EXTRA_ARGS.*'
-    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_ssh_host }}"'
+    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_host }}"'
 
 - name: include etcd tasks
   include_tasks: etcd.yml
