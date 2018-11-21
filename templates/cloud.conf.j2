@@ -2,8 +2,8 @@
 [Global]
 insecure-flag = 1
 port = 443
-secret-name = "{{kubernetes_cloud_provider}}-secret"
-secret-namespace = "kube-system"
+user = "{{ kubernetes_cloud_vsphere_global_user }}"
+password = "{{ kubernetes_cloud_vsphere_global_password }}"
 
 {% for dc in kubernetes_cloud_vsphere_datacenters %}
 [VirtualCenter "{{dc.server}}"]
@@ -18,8 +18,6 @@ server = {{ kubernetes_cloud_vsphere_workspace_server }}
 datacenter = {{ kubernetes_cloud_vsphere_workspace_datacenter }}
 default-datastore = {{ kubernetes_cloud_vsphere_workspace_default_datastore }}
 folder = {{ kubernetes_cloud_vsphere_workspace_folder }}
-user = "{{ kubernetes_cloud_vsphere_workspace_user }}"
-password = "{{ kubernetes_cloud_vsphere_workspace_password }}"
 
 [Disk]
 {% for do in kubernetes_cloud_vsphere_disk_options %}
