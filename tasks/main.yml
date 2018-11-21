@@ -18,15 +18,15 @@
 - name: include install tasks
   import_tasks: install.yml
 
-- name: ensure folder kubeadm exists
+- name: '{{ kubernetes_kubeadm_config_file_path }}'
   file:
     state: directory
-    path: '{{ kubernetes_config_dir }}/kubeadm'
+    path: '{{ kubernetes_kubeadm_config_file_path }}'
 
-- name: ensure kubeadm cluster config exists
+- name: '{{ kubernetes_kubeadm_config_file }}'
   template:
     src: clusterconfig.yaml.j2
-    dest: '{{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml'
+    dest: '{{ kubernetes_kubeadm_config_file }}'
 
 - name: ensure cloud provicer conf exists
   template:
@@ -36,9 +36,9 @@
 
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:
-    path: /etc/default/kubelet
+    path: '{{ kubernetes_kubelet_environment_file }}'
     regexp: '^KUBELET_EXTRA_ARGS.*'
-    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_ssh_host }}"'
+    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_host | default(ansible_default_ipv4.address) }}"'
 
 - name: include etcd tasks
   include_tasks: etcd.yml

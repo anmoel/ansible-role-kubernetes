@@ -18,12 +18,11 @@ kubernetes_apt_repo_url: http://apt.kubernetes.io/
 kubernetes_apt_repo_pool: kubernetes-xenial
 
 #kubeadm ClusterConfiguration vars
-kubernetes_apiserver_dns: ""
-kubernetes_apiserver_port: "6443"
 kubernetes_imageRepository: "k8s.gcr.io"
 kubernetes_master_version: "v1.12.0"
 kubernetes_config_dir: /etc/kubernetes
 kubernetes_certs_dir: "{{ kubernetes_config_dir }}/pki"
+kubernetes_pod_manifest_path: '{{ kubernetes_config_dir }}/manifests'
 kubernetes_cluster_name: "kubernetes"
 kubernetes_log_dir: "/var/log/kubernetes/audit"
 kubernetes_log_age: 2
@@ -54,6 +53,44 @@ kubernetes_etcd_healthcheck_client_cert_file: '{{ kubernetes_etcd_certs_dir }}/h
 kubernetes_etcd_healthcheck_client_key_file: '{{ kubernetes_etcd_certs_dir }}/healthcheck-client.key'
 kubernetes_etcd_apiserver_client_cert_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
 kubernetes_etcd_apiserver_client_key_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
+kubernetes_etcd_manifest_file: '{{ kubernetes_pod_manifest_path }}/etcd.yaml'
+kubernetes_etcd_name: '{{ ansible_hostname }}'
+kubernetes_etcd_server_cert_sans:
+- "{{ ansible_hostname }}"
+- "{{ ansible_nodename }}"
+- "{{ ansible_host }}"
+kubernetes_etcd_peer_cert_sans:
+- "{{ ansible_hostname }}"
+- "{{ ansible_nodename }}"
+- "{{ ansible_host }}"
+kubernetes_etcd_server_port: 2380
+kubernetes_etcd_client_port: 2379
+kubernetes_etcd_advertise_client_urls: 'https://{{ ansible_host }}:{{ kubernetes_etcd_client_port }}'
+kubernetes_etcd_initial_cluster: |
+  {% set res = [] %}
+  {%- for n in groups.etcd %}
+  {% set ignored = res.extend([hostvars[n]['ansible_hostname'] ~ "=https://" ~ hostvars[n]['ansible_host'] ~ ":" ~ kubernetes_etcd_server_port]) %}
+  {% endfor %}
+  {{ res }}
+kubernetes_etcd_initial_advertise_peer_urls: 'https://{{ ansible_host }}:{{ kubernetes_etcd_server_port }}'
+kubernetes_etcd_listen_peer_urls: 'https://{{ ansible_host }}:{{ kubernetes_etcd_server_port }}'
+kubernetes_etcd_listen_client_urls: 'https://{{ ansible_host }}:{{ kubernetes_etcd_client_port }}'
+
+# API server
+kubernetes_apiserver_dns: ""
+kubernetes_apiserver_port: 6443
+kubernetes_apiserver_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'
+
+# Controller Manager
+kubernetes_controller_manager_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'
+
+# Scheduler
+kubernetes_scheduler_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
+
+# kubeadm
+kubernetes_kubeadm_config_file_path: '{{ kubernetes_config_dir }}/kubeadm'
+kubernetes_kubeadm_config_file_name: clusterconfig.yaml
+kubernetes_kubeadm_config_file: '{{ kubernetes_kubeadm_config_file_path }}/{{ kubernetes_kubeadm_config_file_name }}'
 
 # cloud provider vars
 kubernetes_cloud_provider: ""

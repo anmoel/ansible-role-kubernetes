@@ -33,7 +33,7 @@
     - '{{ kubernetes_certs_dir }}/front-proxy-client.key'
 
 - name: gen certs on master ha nodes
-  command: kubeadm alpha phase certs all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase certs all --config {{ kubernetes_kubeadm_config_file }}
   when: (
     master_certs_result.results[0].stat.exists == False or
     master_certs_result.results[1].stat.exists == False or
@@ -43,17 +43,17 @@
     master_certs_result.results[5].stat.exists == False )
 
 - name: write kubelet config on master ha nodes
-  command: kubeadm alpha phase kubelet config write-to-disk --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubelet config write-to-disk --config {{ kubernetes_kubeadm_config_file }}
   changed_when: false
 
 #- name: write kubelet env on master ha nodes
-#  command: kubeadm alpha phase kubelet write-env-file --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+#  command: kubeadm alpha phase kubelet write-env-file --config {{ kubernetes_kubeadm_config_file }}
 #  changed_when: false
 - name: incluse bug work around
   include: master-ha-bug-workaround.yml
 
 - name: write kubelet systemd file on master ha nodes
-  command: kubeadm alpha phase kubeconfig kubelet --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubeconfig kubelet --config {{ kubernetes_kubeadm_config_file }}
   changed_when: false
 
 - name: Ensure kubelet is started and enabled at boot.
@@ -73,7 +73,7 @@
     - '{{ kubernetes_config_dir }}/scheduler.conf'
 
 - name: write kubeconfig files for control-plane on master ha nodes
-  command: kubeadm alpha phase kubeconfig all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubeconfig all --config {{ kubernetes_kubeadm_config_file }}
   when: (
     master_conf_result.results[0].stat.exists == False or
     master_conf_result.results[1].stat.exists == False or
@@ -85,21 +85,21 @@
     path: "{{ item }}"
   register: master_manifest_result
   with_items:
-    - '{{ kubernetes_config_dir }}/manifests/kube-apiserver.yaml'
-    - '{{ kubernetes_config_dir }}/manifests/kube-controller-manager.yaml'
-    - '{{ kubernetes_config_dir }}/manifests/kube-scheduler.yaml'
+    - '{{ kubernetes_apiserver_manifest_file }}'
+    - '{{ kubernetes_controller_manager_manifest_file }}'
+    - '{{ kubernetes_scheduler_manifest_file }}'
 
 - name: write controle-plane manifests on master ha nodes
-  command: kubeadm alpha phase controlplane all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase controlplane all --config {{ kubernetes_kubeadm_config_file }}
   when: (
     master_manifest_result.results[0].stat.exists == False or
     master_manifest_result.results[1].stat.exists == False or
     master_manifest_result.results[2].stat.exists == False )
 
 - name: annotate cri on master ha nodes
-  command: kubeadm alpha phase kubelet config annotate-cri --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase kubelet config annotate-cri --config {{ kubernetes_kubeadm_config_file }}
   changed_when: false
 
 - name: mark as master on master ha nodes
-  command: kubeadm alpha phase mark-master --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
+  command: kubeadm alpha phase mark-master --config {{ kubernetes_kubeadm_config_file }}
   changed_when: false

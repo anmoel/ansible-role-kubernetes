@@ -14,27 +14,26 @@ etcd:
     dataDir: {{ kubernetes_etcd_data_dir }}
     image: {{ kubernetes_etcd_image }}
     serverCertSANs:
-    - "{{ ansible_hostname }}"
-    - "{{ ansible_nodename }}"
-    - "{{ ansible_ssh_host }}"
+{% for san in kubernetes_etcd_server_cert_sans %}
+    - {{ san }}
+{% endfor %}
     peerCertSANs:
-    - "{{ ansible_hostname }}"
-    - "{{ ansible_nodename }}"
-    - "{{ ansible_ssh_host }}"
+{% for san in kubernetes_etcd_peer_cert_sans %}
+    - {{ san }}
+{% endfor %}
     extraArgs:
-      initial-cluster: {% for n in groups.etcd %}{{ hostvars[n]['ansible_hostname'] }}=https://{{ hostvars[n]['ansible_ssh_host'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}
-
+      initial-cluster: {{ kubernetes_etcd_initial_cluster | join(",") }}
       initial-cluster-state: new
-      name: {{ ansible_hostname }}
-      listen-peer-urls: https://{{ ansible_ssh_host }}:2380
-      listen-client-urls: https://{{ ansible_ssh_host }}:2379
-      advertise-client-urls: https://{{ ansible_ssh_host }}:2379
-      initial-advertise-peer-urls: https://{{ ansible_ssh_host }}:2380
+      name: {{ kubernetes_etcd_name }}
+      listen-peer-urls: {{ kubernetes_etcd_listen_peer_urls }}
+      listen-client-urls: {{ kubernetes_etcd_listen_client_urls }}
+      advertise-client-urls: {{ kubernetes_etcd_advertise_client_urls }}
+      initial-advertise-peer-urls: {{ kubernetes_etcd_initial_advertise_peer_urls }}
 {% else %}
   external:
     endpoints:
 {% for n in groups.etcd %}
-    - "https://{{ hostvars[n]['ansible_ssh_host'] }}:2379"
+    - "https://{{ hostvars[n]['ansible_host'] | default(hostvars[n]['ansible_default_ipv4.address']) }}:{{ kubernetes_etcd_client_port }}"
 {% endfor %}
     caFile: {{ kubernetes_etcd_ca_cert_file }}
     certFile: {{ kubernetes_etcd_apiserver_client_cert_file }}
@@ -42,13 +41,13 @@ etcd:
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
 apiServerCertSANs:
-- "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_ssh_host']) }}"
+- "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host']) | default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}"
   {%- if kubernetes_apiserver_dns != "" %}
 - "{{ kubernetes_apiserver_dns }}"
 controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
   {%- else %}
 
-controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_ssh_host']) }}:{{ kubernetes_apiserver_port}}"
+controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host'])| default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}:{{ kubernetes_apiserver_port}}"
   {%- endif %}
 
 apiServerExtraArgs:
