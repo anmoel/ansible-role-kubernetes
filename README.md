@@ -22,6 +22,7 @@ requires loadbalancer or keepalived for HA; recommended role for keepalived inst
 | kubernetes_imageRepository | false | "k8s.gcr.io" | docker registry for kubernetes master components |
 | kubernetes_config_dir | false | "/etc/kubernetes" | Config path |
 | kubernetes_certs_dir | false | "{{ kubernetes_config_dir }}/pki" | certs folder |
+| kubernetes_pod_manifest_path | false | Absoulte path where static pod manifests will be stored | "{{ kubernetes_config_dir }}/manifests" |
 | kubernetes_log_dir | false | | "/var/log/kubernetes/audit" | log folder |
 | kubernetes_log_age | false | 2 | max age of logfiles |
 | kubernetes_etcd_data_dir | false | "/var/etcd" | folder for etcd data |

@@ -84,9 +84,9 @@
   command: kubeadm alpha phase certs apiserver-etcd-client --config={{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml
   when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
 
-- name: check {{ kubernetes_config_dir }}/manifests/etcd.yaml exists
+- name: check {{ kubernetes_pod_manifest_path }}/etcd.yaml exists
   stat:
-    path: '{{ kubernetes_config_dir }}/manifests/etcd.yaml'
+    path: '{{ kubernetes_pod_manifest_path }}/etcd.yaml'
   register: stat_result
 
 - name: generate pod manifest file for etcd

@@ -85,9 +85,9 @@
     path: "{{ item }}"
   register: master_manifest_result
   with_items:
-    - '{{ kubernetes_config_dir }}/manifests/kube-apiserver.yaml'
-    - '{{ kubernetes_config_dir }}/manifests/kube-controller-manager.yaml'
-    - '{{ kubernetes_config_dir }}/manifests/kube-scheduler.yaml'
+    - '{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'
+    - '{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'
+    - '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
 
 - name: write controle-plane manifests on master ha nodes
   command: kubeadm alpha phase controlplane all --config {{ kubernetes_config_dir }}/kubeadm/clusterconfig.yaml

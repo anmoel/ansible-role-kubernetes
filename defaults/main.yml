@@ -24,6 +24,7 @@ kubernetes_imageRepository: "k8s.gcr.io"
 kubernetes_master_version: "v1.12.0"
 kubernetes_config_dir: /etc/kubernetes
 kubernetes_certs_dir: "{{ kubernetes_config_dir }}/pki"
+kubernetes_pod_manifest_path: '{{ kubernetes_config_dir }}/manifests'
 kubernetes_cluster_name: "kubernetes"
 kubernetes_log_dir: "/var/log/kubernetes/audit"
 kubernetes_log_age: 2
