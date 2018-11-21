@@ -18,8 +18,6 @@ kubernetes_apt_repo_url: http://apt.kubernetes.io/
 kubernetes_apt_repo_pool: kubernetes-xenial
 
 #kubeadm ClusterConfiguration vars
-kubernetes_apiserver_dns: ""
-kubernetes_apiserver_port: "6443"
 kubernetes_imageRepository: "k8s.gcr.io"
 kubernetes_master_version: "v1.12.0"
 kubernetes_config_dir: /etc/kubernetes
@@ -55,3 +53,15 @@ kubernetes_etcd_healthcheck_client_cert_file: '{{ kubernetes_etcd_certs_dir }}/h
 kubernetes_etcd_healthcheck_client_key_file: '{{ kubernetes_etcd_certs_dir }}/healthcheck-client.key'
 kubernetes_etcd_apiserver_client_cert_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.crt'
 kubernetes_etcd_apiserver_client_key_file: '{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'
+kubernetes_etcd_manifest_file: '{{ kubernetes_pod_manifest_path }}/etcd.yaml'
+
+# API server
+kubernetes_apiserver_dns: ""
+kubernetes_apiserver_port: 6443
+kubernetes_apiserver_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'
+
+# Controller Manager
+kubernetes_controller_manager_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-controller-manager.yaml'
+
+# Scheduler
+kubernetes_scheduler_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'
