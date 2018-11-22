@@ -9,6 +9,7 @@ password = "{{ kubernetes_cloud_vsphere_global_password }}"
 [VirtualCenter "{{dc.server}}"]
 datacenters = "{{dc.datacenters}}"
 {% if dc.username is defined %}user = "{{dc.username}}"{% endif %}
+
 {% if dc.password is defined %}password = "{{dc.password}}"{% endif %}
 {% endfor %}
 

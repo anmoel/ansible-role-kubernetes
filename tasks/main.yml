@@ -58,10 +58,6 @@
   include_tasks: network_plugin.yml
   when: inventory_hostname == groups.k8s_masters[0]
 
-- name: include cloud-provider tasks
-  include_tasks: cloud_provider.yml
-  when: inventory_hostname == groups.k8s_masters[0]
-
 - name: include join worker tasks
   include_tasks: join.yml
   when: inventory_hostname not in groups.k8s_masters
