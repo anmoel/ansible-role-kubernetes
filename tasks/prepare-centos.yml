@@ -30,6 +30,7 @@
 - name: "Disable SELinux (CentOS)"
   selinux:
     state: disabled
+<<<<<<< HEAD
 
 - name: "ensure br_netfilter kernel modul is loaded"
   modprobe:
@@ -46,3 +47,16 @@
 - name: "ensure /proc/sys/net/bridge/bridge-nf-call-iptables is set to 1"
   shell: "echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables"
   when: bridge_nf_register.stdout == '0'
+=======
+    
+- name: "Disable swapoff permanently"
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: "Disable swap"
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+>>>>>>> master
