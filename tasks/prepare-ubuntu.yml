@@ -15,3 +15,14 @@
   apt:
     update_cache: yes
   changed_when: false
+ 
+- name: "Disable swapoff permanently"
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: "Disable swap"
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
