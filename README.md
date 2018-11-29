@@ -153,6 +153,7 @@ Apache 2.0
 ## Contributors
 
 - [Thomas Krahn](https://github.com/Nosmoht)
+- [Björn Jessen-Noak](https://github.com/oswalya)
 
 # Author Information
 
