@@ -63,6 +63,21 @@
 - debug: var=init_output
   when: inventory_hostname == groups.k8s_masters[0]
 
+- name: ensure .kube folder exists on first master
+  file:
+    path: /root/.kube
+    state: directory
+  when:
+  - inventory_hostname == groups.k8s_masters[0]
+
+- name: ensure kube config exists on first master
+  copy:
+    src: "{{ kubernetes_config_dir }}/admin.conf"
+    dest: /root/.kube/config
+    remote_src: yes
+  when:
+  - inventory_hostname == groups.k8s_masters[0]
+
 - name: include master ha tasks
   include: master-ha.yml
   when: ( groups.k8s_masters | length > 1 ) and inventory_hostname != groups.k8s_masters[0]

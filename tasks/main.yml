@@ -39,6 +39,14 @@
     path: '{{ kubernetes_kubelet_environment_file }}'
     regexp: '^KUBELET_EXTRA_ARGS.*'
     line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_host | default(ansible_default_ipv4.address) }}"'
+  register: kubernetes_systemd_register
+
+- debug: var=kubernetes_systemd_register
+
+- name: Reload systemd unit if args were changed.
+  systemd:
+    daemon_reload: true
+  when: kubernetes_systemd_register is changed
 
 - name: include etcd tasks
   include_tasks: etcd.yml
