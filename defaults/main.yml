@@ -104,31 +104,3 @@ kubernetes_cloud_vsphere_default_password: ""
 kubernetes_cloud_vsphere_datacenters: []
 kubernetes_cloud_vsphere_network_options: []
 kubernetes_cloud_vsphere_disk_options: []
-
-#
-#
-# apiVersion: storage.k8s.io/v1
-# kind: StorageClass
-# metadata:
-#   annotations:
-#     storageclass.kubernetes.io/is-default-class: "true"
-#   name: thin-disk
-# parameters:
-#   diskformat: thin
-# provisioner: kubernetes.io/vsphere-volume
-# reclaimPolicy: Delete
-# volumeBindingMode: Immediate
-#
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: amoeller-claim
-# spec:
-#   accessModes:
-#     - ReadWriteOnce
-#   volumeMode: Filesystem
-#   resources:
-#     requests:
-#       storage: 8Gi
-#   storageClassName: thin-disk
-#
