@@ -61,6 +61,7 @@
     name: kubelet
     state: started
     enabled: true
+    daemon_reload: yes
 
 - name: check master admin conf exists
   stat:

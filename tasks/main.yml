@@ -28,11 +28,25 @@
     src: clusterconfig.yaml.j2
     dest: '{{ kubernetes_kubeadm_config_file }}'
 
+- name: ensure cloud provicer conf exists
+  template:
+    src: cloud.conf.j2
+    dest: "{{ kubernetes_cloud_config_file }}"
+  when: kubernetes_cloud_provider != ""
+
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:
     path: '{{ kubernetes_kubelet_environment_file }}'
     regexp: '^KUBELET_EXTRA_ARGS.*'
-    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_host }}"'
+    line: 'KUBELET_EXTRA_ARGS="--node-ip={{ ansible_host | default(ansible_default_ipv4.address) }}"'
+  register: kubernetes_systemd_register
+
+- debug: var=kubernetes_systemd_register
+
+- name: Reload systemd unit if args were changed.
+  systemd:
+    daemon_reload: true
+  when: kubernetes_systemd_register is changed
 
 - name: include etcd tasks
   include_tasks: etcd.yml

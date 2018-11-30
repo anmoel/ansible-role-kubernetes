@@ -150,9 +150,10 @@ There is an Vagrantfile to create all servers for all szenarios:
 
 Apache 2.0
 
-# contributors
+## Contributors
 
- - [Thomas Krahn](https://github.com/Nosmoht)
+- [Thomas Krahn](https://github.com/Nosmoht)
+- [Björn Jessen-Noak](https://github.com/oswalya)
 
 # Author Information
 

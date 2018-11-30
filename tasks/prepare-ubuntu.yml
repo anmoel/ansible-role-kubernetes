@@ -1,5 +1,14 @@
 ---
 
+- name: Install pip
+  apt:
+    name: python-pip
+    state: present
+
+- name: install docker-py
+  pip:
+    name: docker-py
+
 - name: "Add gpg key (Ubuntu)"
   apt_key:
     url: "{{ kubernetes_debian_apt_key }}"
@@ -15,7 +24,7 @@
   apt:
     update_cache: yes
   changed_when: false
- 
+
 - name: "Disable swapoff permanently"
   replace:
     path: /etc/fstab

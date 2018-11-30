@@ -1,5 +1,17 @@
 ---
 
+- name: Install pip
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - epel-release
+    - python-pip
+
+- name: install docker-py
+  pip:
+    name: docker-py
+
 - name: "Add Kubernetes repository and install gpg key (CentOS)"
   yum_repository:
     name: kubernetes
@@ -30,7 +42,23 @@
 - name: "Disable SELinux (CentOS)"
   selinux:
     state: disabled
-    
+
+- name: "ensure br_netfilter kernel modul is loaded"
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: check /proc/sys/net/bridge/bridge-nf-call-iptables
+  command: cat /proc/sys/net/bridge/bridge-nf-call-iptables
+  register: bridge_nf_register
+  changed_when: false
+
+- debug: var=bridge_nf_register
+
+- name: "ensure /proc/sys/net/bridge/bridge-nf-call-iptables is set to 1"
+  shell: "echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables"
+  when: bridge_nf_register.stdout == '0'
+
 - name: "Disable swapoff permanently"
   replace:
     path: /etc/fstab

@@ -33,7 +33,7 @@ etcd:
   external:
     endpoints:
 {% for n in groups.etcd %}
-    - "https://{{ hostvars[n]['ansible_ssh_host'] }}:{{ kubernetes_etcd_client_port }}"
+    - "https://{{ hostvars[n]['ansible_host'] | default(hostvars[n]['ansible_default_ipv4.address']) }}:{{ kubernetes_etcd_client_port }}"
 {% endfor %}
     caFile: {{ kubernetes_etcd_ca_cert_file }}
     certFile: {{ kubernetes_etcd_apiserver_client_cert_file }}
@@ -41,20 +41,48 @@ etcd:
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
 apiServerCertSANs:
-- "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_ssh_host']) }}"
+- "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host']) | default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}"
   {%- if kubernetes_apiserver_dns != "" %}
 - "{{ kubernetes_apiserver_dns }}"
 controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
   {%- else %}
 
-controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_ssh_host']) }}:{{ kubernetes_apiserver_port}}"
+controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host'])| default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}:{{ kubernetes_apiserver_port}}"
   {%- endif %}
 
 apiServerExtraArgs:
   authorization-mode: {{ kubernetes_authorization_mode }}
   enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
+{% if kubernetes_cloud_provider != "" %}
+  cloud-provider: "{{ kubernetes_cloud_provider }}"
+  cloud-config: "{{ kubernetes_cloud_config_file }}"
+apiServerExtraVolumes:
+- name: cloud
+  hostPath: "{{ kubernetes_cloud_config_file }}"
+  mountPath: "{{ kubernetes_cloud_config_file }}"
+controllerManagerExtraArgs:
+  cloud-provider: "{{ kubernetes_cloud_provider }}"
+  cloud-config: "{{ kubernetes_cloud_config_file }}"
+controllerManagerExtraVolumes:
+- name: cloud
+  hostPath: "{{ kubernetes_cloud_config_file }}"
+  mountPath: "{{ kubernetes_cloud_config_file }}"
+{%- endif %}
+
 networking:
   dnsDomain: {{ kubernetes_dns_domain }}
   podSubnet: {{ kubernetes_pod_subnet }}
   serviceSubnet: {{ kubernetes_service_subnet }}
+
+{% endif %}
+
+{% if kubernetes_cloud_provider != "" %}
+---
+
+apiVersion: kubeadm.k8s.io/v1alpha3
+kind: InitConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    cloud-provider: "{{ kubernetes_cloud_provider }}"
+    cloud-config: "{{ kubernetes_cloud_config_file }}"
 {% endif %}

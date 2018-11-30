@@ -58,11 +58,11 @@ kubernetes_etcd_name: '{{ ansible_hostname }}'
 kubernetes_etcd_server_cert_sans:
 - "{{ ansible_hostname }}"
 - "{{ ansible_nodename }}"
-- "{{ ansible_ssh_host }}"
+- "{{ ansible_host }}"
 kubernetes_etcd_peer_cert_sans:
 - "{{ ansible_hostname }}"
 - "{{ ansible_nodename }}"
-- "{{ ansible_ssh_host }}"
+- "{{ ansible_host }}"
 kubernetes_etcd_server_port: 2380
 kubernetes_etcd_client_port: 2379
 kubernetes_etcd_advertise_client_urls: 'https://{{ ansible_host }}:{{ kubernetes_etcd_client_port }}'
@@ -91,3 +91,16 @@ kubernetes_scheduler_manifest_file: '{{ kubernetes_pod_manifest_path }}/kube-sch
 kubernetes_kubeadm_config_file_path: '{{ kubernetes_config_dir }}/kubeadm'
 kubernetes_kubeadm_config_file_name: clusterconfig.yaml
 kubernetes_kubeadm_config_file: '{{ kubernetes_kubeadm_config_file_path }}/{{ kubernetes_kubeadm_config_file_name }}'
+
+# cloud provider vars
+kubernetes_cloud_provider: ""
+kubernetes_cloud_config_file: "{{ kubernetes_config_dir }}/{{ kubernetes_cloud_provider }}.conf"
+kubernetes_cloud_vsphere_workspace_server: ""
+kubernetes_cloud_vsphere_workspace_datacenter: ""
+kubernetes_cloud_vsphere_workspace_default_datastore: ""
+kubernetes_cloud_vsphere_workspace_folder: ""
+kubernetes_cloud_vsphere_default_user: ""
+kubernetes_cloud_vsphere_default_password: ""
+kubernetes_cloud_vsphere_datacenters: []
+kubernetes_cloud_vsphere_network_options: []
+kubernetes_cloud_vsphere_disk_options: []

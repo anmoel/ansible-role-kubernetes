@@ -1,0 +1,33 @@
+{% if kubernetes_cloud_provider == "vsphere" %}
+[Global]
+insecure-flag = 1
+port = 443
+user = "{{ kubernetes_cloud_vsphere_global_user }}"
+password = "{{ kubernetes_cloud_vsphere_global_password }}"
+datacenters = "{{ kubernetes_cloud_vsphere_global_datacenters }}"
+
+{% for dc in kubernetes_cloud_vsphere_datacenters %}
+[VirtualCenter "{{dc.server}}"]
+datacenters = "{{dc.datacenters}}"
+{% if dc.username is defined %}user = "{{dc.username}}"{% endif %}
+
+{% if dc.password is defined %}password = "{{dc.password}}"{% endif %}
+{% endfor %}
+
+
+[Workspace]
+server = "{{ kubernetes_cloud_vsphere_workspace_server }}"
+datacenter = "{{ kubernetes_cloud_vsphere_workspace_datacenter }}"
+default-datastore = "{{ kubernetes_cloud_vsphere_workspace_default_datastore }}"
+folder = "{{ kubernetes_cloud_vsphere_workspace_folder }}"
+
+[Disk]
+{% for do in kubernetes_cloud_vsphere_disk_options %}
+{{ do }}
+{% endfor %}
+
+[Network]
+{% for no in kubernetes_cloud_vsphere_network_options %}
+{{ no }}
+{% endfor %}
+{%- endif %}
