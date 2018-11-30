@@ -74,3 +74,19 @@
 #  include_tasks: update_master.yml
 #  when: inventory_hostname in groups.k8s_masters
 #  tags: k8s_update
+
+- name: wait for cluster get ready
+  pause:
+    seconds: 60
+
+- name: check cluster state
+  command: kubectl get nodes -o wide
+  register: cluster_state_register
+  when: inventory_hostname == groups.k8s_masters[0]
+  changed_when: false
+
+- name: print cluster-state
+  debug:
+    var: "{{ item }}"
+  with_items: "cluster_state_register.stdout_lines"
+  when: inventory_hostname == groups.k8s_masters[0]

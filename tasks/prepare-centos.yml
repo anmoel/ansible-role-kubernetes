@@ -1,17 +1,5 @@
 ---
 
-- name: Install pip
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - epel-release
-    - python-pip
-
-- name: install docker-py
-  pip:
-    name: docker-py
-
 - name: "Add Kubernetes repository and install gpg key (CentOS)"
   yum_repository:
     name: kubernetes

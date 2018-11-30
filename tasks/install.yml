@@ -9,3 +9,30 @@
     state: "{{ item.state | default('present') }}"
   notify: restart kubelet
   with_items: "{{ kubernetes_packages }}"
+
+- name: check pip is installed
+  command: pip -V
+  register: pip_register
+  failed_when: false
+  changed_when: false
+
+- name: get get-pip python script
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /root/get-pip.py
+    mode: 0550
+  when: pip_register.rc != 0
+
+- name: Install pip
+  command: python /root/get-pip.py
+  when: pip_register.rc != 0
+
+- name: remove get-pip python script
+  file:
+    path: /root/get-pip.py
+    state: absent
+  when: pip_register.rc != 0
+
+- name: install docker-py
+  pip:
+    name: docker-py
