@@ -40,26 +40,26 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 
 ## Common
 
-| Name | Required | Default | Describtion |
-|:-----|:---------|:--------|:------------|
-| kubernetes_cluster_name | false | "kubernetes" | kubernetes cluster name |
-| kubernetes_master_version | false | "v1.12.0" | This is the version of the kubernetes master components |
-| kubernetes_version_rhel_package | false | '1.12.1' | only redhat, version of kubectl,kubeadm,kubelet |
-| kubernetes_yum_arch | false | x86_64 | only redhat |
-| kubernetes_apt_repo_url | false | http://apt.kubernetes.io/ | only debian, kubernetes repository |
-| kubernetes_apt_repo_pool | false | kubernetes-xenial | only debian, kubernetes repository pool |
-| kubernetes_imageRepository | false | "k8s.gcr.io" | docker registry for kubernetes master components |
-| kubernetes_config_dir | false | "/etc/kubernetes" | Config path |
-| kubernetes_certs_dir | false | "{{ kubernetes_config_dir }}/pki" | certs folder |
-| kubernetes_pod_manifest_path | false | Absoulte path where static pod manifests will be stored | "{{ kubernetes_config_dir }}/manifests" |
-| kubernetes_log_dir | false | | "/var/log/kubernetes/audit" | log folder |
-| kubernetes_log_age | false | 2 | max age of logfiles |
-| kubernetes_authorization_mode | false | "Node,RBAC" | kubernetes authorization mode |
-| kubernetes_enable_admission_plugins | false | | "Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota" | kubernetes enabled admission plugins |
-| kubernetes_dns_domain | false | "cluster.local" | internal dns domain in kubernetes cluster |
-| kubernetes_pod_subnet | false | "10.244.0.0/16" | ipv4 subnet for pods, must be a cidr |
-| kubernetes_service_subnet | false | "10.96.0.0/16" | ipv4 subnet vor service, must be a cidr |
-| kubernetes_kubelet_extra_args | false | "" | extra arguments for the kubelet daemon |
+| Name | Default | Describtion |
+|:-----|:--------|:------------|
+| kubernetes_cluster_name | "kubernetes" | kubernetes cluster name |
+| kubernetes_master_version | "v1.12.2" | This is the version of the kubernetes master components |
+| kubernetes_version_rhel_package | '1.12.2' | only redhat, version of kubectl,kubeadm,kubelet |
+| kubernetes_yum_arch | x86_64 | only redhat |
+| kubernetes_apt_repo_url | http://apt.kubernetes.io/ | only debian, kubernetes repository |
+| kubernetes_apt_repo_pool | kubernetes-xenial | only debian, kubernetes repository pool |
+| kubernetes_imageRepository | "k8s.gcr.io" | docker registry for kubernetes master components |
+| kubernetes_config_dir | "/etc/kubernetes" | Config path |
+| kubernetes_certs_dir | "{{ kubernetes_config_dir }}/pki" | certs folder |
+| kubernetes_pod_manifest_path | Absoulte path where static pod manifests will be stored | "{{ kubernetes_config_dir }}/manifests" |
+| kubernetes_log_dir | "/var/log/kubernetes/audit" | log folder |
+| kubernetes_log_age | 2 | max age of logfiles |
+| kubernetes_authorization_mode | "Node,RBAC" | kubernetes authorization mode |
+| kubernetes_enable_admission_plugins | "Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota" | kubernetes enabled admission plugins |
+| kubernetes_dns_domain | "cluster.local" | internal dns domain in kubernetes cluster |
+| kubernetes_pod_subnet | "10.244.0.0/16" | ipv4 subnet for pods, must be a cidr |
+| kubernetes_service_subnet | "10.96.0.0/16" | ipv4 subnet vor service, must be a cidr |
+| kubernetes_kubelet_extra_args | "" | extra arguments for the kubelet daemon |
 | kubernetes_packages| false | `- name: kubelet` | the name of the kubernetes packages, |
 | | |  `  state: present` | where isntalled from package-manager |
 | | |  `- name: kubectl` | |
@@ -68,15 +68,15 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | | |  `  state: present` | |
 | | |  `- name: kubernetes-cni` | |
 | | |  `  state: present` | |
-| kubernetes_version_kubeadm | false | 'stable-{{ kubernetes_version }}' | version of kubeadm |
+| kubernetes_version_kubeadm | 'stable-{{ kubernetes_version }}' | version of kubeadm |
 
 ## API server
 
-| Name | Required | Default | Describtion |
-| --- | --- | --- | --- |
-| kubernetes_apiserver_dns | false | `""` | dns-name for kubernetes apiserver |
-| kubernetes_apiserver_port | false | `6443` | port of kubernetes apiserver |
-| kubernetes_apiserver_manifest_file | false | `'{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'` | Absolute path to manifest file |
+| Name | Default | Describtion |
+| --- | --- | --- |
+| kubernetes_apiserver_dns | `""` | dns-name for kubernetes apiserver |
+| kubernetes_apiserver_port | `6443` | port of kubernetes apiserver |
+| kubernetes_apiserver_manifest_file | `'{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'` | Absolute path to manifest file |
 
 ## Etcd
 
@@ -117,6 +117,22 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | Name | Description | Default |
 | --- | --- | --- |
 | kubernetes_scheduler_manifest_file | Absolute path to manifest file | `'{{ kubernetes_pod_manifest_path }}/kube-scheduler.yaml'` |
+
+## Cloud Provider
+
+| Name | Description | Default |
+| --- | --- | --- |
+| kubernetes_cloud_provider | choose supported cloudprovider, values: "" or "vsphere" | ""
+| kubernetes_cloud_config_file | path for cloud_config file | "{{ kubernetes_config_dir }}/{{ kubernetes_cloud_provider }}.conf"
+| kubernetes_cloud_vsphere_workspace_server | option server in area \[workspace\] of the cloud_config (only vsphere) | ""
+| kubernetes_cloud_vsphere_workspace_datacenter | option datacenter in area \[workspace\] of the cloud_config (only vsphere) | ""
+| kubernetes_cloud_vsphere_workspace_default_datastore | option default_datastore in area \[workspace\] of the cloud_config (only vsphere) | ""
+| kubernetes_cloud_vsphere_workspace_folder | option folder in area \[workspace\] of the cloud_config (only vsphere) | ""
+| kubernetes_cloud_vsphere_default_user | option user in the area \[global\] of the cloud_config (only vsphere) | ""
+| kubernetes_cloud_vsphere_default_password | option password in the area \[global\] of the cloud_config (only vsphere) | ""
+| kubernetes_cloud_vsphere_datacenters | list of datacenters with the attributes: server,datatcenters,username,password of the cloud_config (only vsphere) | []
+| kubernetes_cloud_vsphere_network_options | all options in the area \[network\] of the cloud_config (only vsphere) | []
+| kubernetes_cloud_vsphere_disk_options | all options in the area \[disk\] of the cloud_config (only vsphere) | []
 
 # Example Playbooks
 
