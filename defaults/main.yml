@@ -12,14 +12,14 @@ kubernetes_packages:
     state: present
 
 kubernetes_version: '1.12'
-kubernetes_version_rhel_package: '1.12.1'
+kubernetes_version_rhel_package: '1.12.2'
 kubernetes_yum_arch: x86_64
 kubernetes_apt_repo_url: http://apt.kubernetes.io/
 kubernetes_apt_repo_pool: kubernetes-xenial
 
 #kubeadm ClusterConfiguration vars
 kubernetes_imageRepository: "k8s.gcr.io"
-kubernetes_master_version: "v1.12.0"
+kubernetes_master_version: "v1.12.2"
 kubernetes_config_dir: /etc/kubernetes
 kubernetes_certs_dir: "{{ kubernetes_config_dir }}/pki"
 kubernetes_pod_manifest_path: '{{ kubernetes_config_dir }}/manifests'
@@ -104,3 +104,31 @@ kubernetes_cloud_vsphere_default_password: ""
 kubernetes_cloud_vsphere_datacenters: []
 kubernetes_cloud_vsphere_network_options: []
 kubernetes_cloud_vsphere_disk_options: []
+
+#
+#
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   annotations:
+#     storageclass.kubernetes.io/is-default-class: "true"
+#   name: thin-disk
+# parameters:
+#   diskformat: thin
+# provisioner: kubernetes.io/vsphere-volume
+# reclaimPolicy: Delete
+# volumeBindingMode: Immediate
+#
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: amoeller-claim
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   volumeMode: Filesystem
+#   resources:
+#     requests:
+#       storage: 8Gi
+#   storageClassName: thin-disk
+#
