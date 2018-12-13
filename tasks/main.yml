@@ -50,7 +50,10 @@
 
 - name: include etcd tasks
   include_tasks: etcd.yml
-  when: inventory_hostname in groups.etcd
+  when:
+  - inventory_hostname in groups.etcd
+  - inventory_hostname not in groups.k8s_masters
+
 
 - name: include master with etcd prepare tasks
   include_tasks: prepare_master_with_etcd.yml
@@ -68,7 +71,6 @@
 
 - name: include join worker tasks
   include_tasks: join.yml
-  when: inventory_hostname not in groups.k8s_masters
 
 #- name: include update master tasks
 #  include_tasks: update_master.yml

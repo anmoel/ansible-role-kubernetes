@@ -20,87 +20,19 @@
     dest: "{{ item.source }}"
   with_items: "{{ master_certs_configs_register.results }}"
 
-- name: check master certs exists
-  stat:
-    path: "{{ item }}"
-  register: master_certs_result
-  with_items:
-    - '{{ kubernetes_certs_dir }}/apiserver-kubelet-client.crt'
-    - '{{ kubernetes_certs_dir }}/apiserver-kubelet-client.key'
-    - '{{ kubernetes_certs_dir }}/apiserver.crt'
-    - '{{ kubernetes_certs_dir }}/apiserver.key'
-    - '{{ kubernetes_certs_dir }}/front-proxy-client.crt'
-    - '{{ kubernetes_certs_dir }}/front-proxy-client.key'
-
-- name: gen certs on master ha nodes
-  command: kubeadm init phase certs all --config {{ kubernetes_kubeadm_config_file }}
-  when: (
-    master_certs_result.results[0].stat.exists == False or
-    master_certs_result.results[1].stat.exists == False or
-    master_certs_result.results[2].stat.exists == False or
-    master_certs_result.results[3].stat.exists == False or
-    master_certs_result.results[4].stat.exists == False or
-    master_certs_result.results[5].stat.exists == False )
-
-- name: write kubelet config on master ha nodes
-  command: kubeadm init phase kubelet config write-to-disk --config {{ kubernetes_kubeadm_config_file }}
+- name: check node is already in cluster
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  command: "kubectl get nodes -n kube-system --kubeconfig {{ kubernetes_config_dir }}/admin.conf -o name"
+  register: get_node_register
   changed_when: false
 
-#- name: write kubelet env on master ha nodes
-#  command: kubeadm alpha phase kubelet write-env-file --config {{ kubernetes_kubeadm_config_file }}
-#  changed_when: false
-- name: incluse bug work around
-  include: master-ha-bug-workaround.yml
-
-- name: write kubelet systemd file on master ha nodes
-  command: kubeadm init phase kubeconfig kubelet --config {{ kubernetes_kubeadm_config_file }}
+- name: get join command from master
+  delegate_to: "{{ groups.k8s_masters[0] }}"
+  command: "kubeadm token create --print-join-command"
   changed_when: false
+  when: ( 'node/' + ansible_nodename ) not in get_node_register.stdout_lines
+  register: join_command_register
 
-- name: Ensure kubelet is started and enabled at boot.
-  service:
-    name: kubelet
-    state: started
-    enabled: true
-    daemon_reload: yes
-
-- name: check master admin conf exists
-  stat:
-    path: "{{ item }}"
-  register: master_conf_result
-  with_items:
-    - '{{ kubernetes_config_dir }}/admin.conf'
-    - '{{ kubernetes_config_dir }}/controller-manager.conf'
-    - '{{ kubernetes_config_dir }}/kubelet.conf'
-    - '{{ kubernetes_config_dir }}/scheduler.conf'
-
-- name: write kubeconfig files for control-plane on master ha nodes
-  command: kubeadm init phase kubeconfig all --config {{ kubernetes_kubeadm_config_file }}
-  when: (
-    master_conf_result.results[0].stat.exists == False or
-    master_conf_result.results[1].stat.exists == False or
-    master_conf_result.results[2].stat.exists == False or
-    master_conf_result.results[3].stat.exists == False )
-
-- name: check master manifests exists
-  stat:
-    path: "{{ item }}"
-  register: master_manifest_result
-  with_items:
-    - '{{ kubernetes_apiserver_manifest_file }}'
-    - '{{ kubernetes_controller_manager_manifest_file }}'
-    - '{{ kubernetes_scheduler_manifest_file }}'
-
-- name: write controle-plane manifests on master ha nodes
-  command: kubeadm init phase controlplane all --config {{ kubernetes_kubeadm_config_file }}
-  when: (
-    master_manifest_result.results[0].stat.exists == False or
-    master_manifest_result.results[1].stat.exists == False or
-    master_manifest_result.results[2].stat.exists == False )
-
-- name: annotate cri on master ha nodes
-  command: kubeadm init phase kubelet config annotate-cri --config {{ kubernetes_kubeadm_config_file }}
-  changed_when: false
-
-- name: mark as master on master ha nodes
-  command: kubeadm init phase mark-master --config {{ kubernetes_kubeadm_config_file }}
-  changed_when: false
+- name: join master node into cluster
+  command: "{{ join_command_register.stdout }} --experimental-control-plane"
+  when: ( 'node/' + ansible_nodename ) not in get_node_register.stdout_lines

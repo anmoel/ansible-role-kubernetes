@@ -38,13 +38,12 @@ etcd:
     keyFile: {{ kubernetes_etcd_apiserver_client_key_file }}
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
-  {%- if kubernetes_apiserver_dns != "" %}
+{% if kubernetes_apiserver_dns != "" %}
 - "{{ kubernetes_apiserver_dns }}"
 controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
-  {%- else %}
+{% else %}
 controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host'])| default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}:{{ kubernetes_apiserver_port}}"
-  {%- endif %}
-
+{% endif %}
 apiServer:
   certSANs:
   - "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host']) | default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}"
@@ -68,7 +67,7 @@ controllerManager:
   - name: cloud
     hostPath: "{{ kubernetes_cloud_config_file }}"
     mountPath: "{{ kubernetes_cloud_config_file }}"
-{%- endif %}
+{% endif %}
 networking:
   dnsDomain: {{ kubernetes_dns_domain }}
   podSubnet: {{ kubernetes_pod_subnet }}
