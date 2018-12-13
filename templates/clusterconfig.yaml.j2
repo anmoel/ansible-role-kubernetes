@@ -1,18 +1,16 @@
-apiVersion: "kubeadm.k8s.io/v1alpha3"
+apiVersion: "kubeadm.k8s.io/v1beta1"
 kind: ClusterConfiguration
 imageRepository: {{ kubernetes_imageRepository }}
+useHyperKubeImage: {{ kubernetes_useHyperKubeImage }}
 kubernetesVersion: {{ kubernetes_master_version }}
 certificatesDir: {{ kubernetes_certs_dir }}
 clusterName: {{ kubernetes_cluster_name }}
-auditPolicy:
-  logDir: {{ kubernetes_log_dir }}
-  logMaxAge: {{ kubernetes_log_age }}
-  path: ""
+dns:
+  type: {{ kubernetes_dns_type }}
 etcd:
 {% if inventory_hostname in groups.etcd %}
   local:
     dataDir: {{ kubernetes_etcd_data_dir }}
-    image: {{ kubernetes_etcd_image }}
     serverCertSANs:
 {% for san in kubernetes_etcd_server_cert_sans %}
     - {{ san }}
@@ -40,49 +38,59 @@ etcd:
     keyFile: {{ kubernetes_etcd_apiserver_client_key_file }}
 {% endif %}
 {% if inventory_hostname in groups.k8s_masters %}
-apiServerCertSANs:
-- "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host']) | default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}"
   {%- if kubernetes_apiserver_dns != "" %}
 - "{{ kubernetes_apiserver_dns }}"
 controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
   {%- else %}
-
 controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host'])| default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}:{{ kubernetes_apiserver_port}}"
   {%- endif %}
 
-apiServerExtraArgs:
-  authorization-mode: {{ kubernetes_authorization_mode }}
-  enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
+apiServer:
+  certSANs:
+  - "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host']) | default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}"
+  extraArgs:
+    authorization-mode: {{ kubernetes_authorization_mode }}
+    enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
+    auditLogDir: "{{ kubernetes_log_dir }}"
+    auditLogMaxAge: "{{ kubernetes_log_age }}"
+    auditPath: "{{ kubernetes_log_dir }}/api-server.log"
 {% if kubernetes_cloud_provider != "" %}
-  cloud-provider: "{{ kubernetes_cloud_provider }}"
-  cloud-config: "{{ kubernetes_cloud_config_file }}"
-apiServerExtraVolumes:
-- name: cloud
-  hostPath: "{{ kubernetes_cloud_config_file }}"
-  mountPath: "{{ kubernetes_cloud_config_file }}"
-controllerManagerExtraArgs:
-  cloud-provider: "{{ kubernetes_cloud_provider }}"
-  cloud-config: "{{ kubernetes_cloud_config_file }}"
-controllerManagerExtraVolumes:
-- name: cloud
-  hostPath: "{{ kubernetes_cloud_config_file }}"
-  mountPath: "{{ kubernetes_cloud_config_file }}"
+    cloud-provider: "{{ kubernetes_cloud_provider }}"
+    cloud-config: "{{ kubernetes_cloud_config_file }}"
+  extraVolumes:
+  - name: cloud
+    hostPath: "{{ kubernetes_cloud_config_file }}"
+    mountPath: "{{ kubernetes_cloud_config_file }}"
+controllerManager:
+  extraArgs:
+    cloud-provider: "{{ kubernetes_cloud_provider }}"
+    cloud-config: "{{ kubernetes_cloud_config_file }}"
+  extraVolumes:
+  - name: cloud
+    hostPath: "{{ kubernetes_cloud_config_file }}"
+    mountPath: "{{ kubernetes_cloud_config_file }}"
 {%- endif %}
-
 networking:
   dnsDomain: {{ kubernetes_dns_domain }}
   podSubnet: {{ kubernetes_pod_subnet }}
   serviceSubnet: {{ kubernetes_service_subnet }}
-
 {% endif %}
 
-{% if kubernetes_cloud_provider != "" %}
 ---
 
-apiVersion: kubeadm.k8s.io/v1alpha3
+apiVersion: kubeadm.k8s.io/v1beta1
 kind: InitConfiguration
 nodeRegistration:
+  taints:
+{% if inventory_hostname in groups.k8s_masters %}
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+{% elif inventory_hostname in groups.etcd %}
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/etcd
+{% endif %}
   kubeletExtraArgs:
+{% if kubernetes_cloud_provider != "" %}
     cloud-provider: "{{ kubernetes_cloud_provider }}"
     cloud-config: "{{ kubernetes_cloud_config_file }}"
 {% endif %}

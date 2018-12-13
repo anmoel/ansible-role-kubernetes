@@ -48,6 +48,8 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_yum_arch | x86_64 | only redhat |
 | kubernetes_apt_repo_url | http://apt.kubernetes.io/ | only debian, kubernetes repository |
 | kubernetes_apt_repo_pool | kubernetes-xenial | only debian, kubernetes repository pool |
+| kubernetes_useHyperKubeImage | "false" | switch to change control-plane docker image to hyperkube |
+| kubernetes_dns_type | "CoreDNS" | dns plugin in kubernetes, could be: "kube-dns" or "CoreDNS" |
 | kubernetes_imageRepository | "k8s.gcr.io" | docker registry for kubernetes master components |
 | kubernetes_config_dir | "/etc/kubernetes" | Config path |
 | kubernetes_certs_dir | "{{ kubernetes_config_dir }}/pki" | certs folder |
@@ -96,7 +98,6 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_etcd_apiserver_client_key_file | | `'{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'` |
 | kubernetes_etcd_manifest_file | | `'{{ kubernetes_pod_manifest_path }}/etcd.yaml'` |
 | kubernetes_etcd_data_dir | folder for etcd data | `/var/etcd` |  |
-| kubernetes_etcd_image | image name for own etcd-container |  |
 | kubernetes_etcd_server_port | Etcd server communication port |  `2380` |
 | kubernetes_etcd_client_port | Etcd client communication port | `2379` |
 

@@ -23,7 +23,7 @@
     - "{{ etcd_apiserver_certs_register.results }}"
 
 - name: run preflight checks
-  command: kubeadm alpha phase preflight master --config {{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase preflight --config {{ kubernetes_kubeadm_config_file }}
   when:
   - inventory_hostname == groups.k8s_masters[0]
   - inventory_hostname not in groups.etcd
@@ -42,7 +42,7 @@
   register: init_output
 
 - name: run preflight checks
-  command: kubeadm alpha phase preflight master --config {{ kubernetes_kubeadm_config_file }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379
+  command: kubeadm init phase preflight --config {{ kubernetes_kubeadm_config_file }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379,Port-2380
   when:
   - inventory_hostname == groups.k8s_masters[0]
   - inventory_hostname in groups.etcd

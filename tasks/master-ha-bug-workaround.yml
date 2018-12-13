@@ -15,5 +15,5 @@
   changed_when: false
 
 - name: write kubelet env on master ha nodes
-  command: kubeadm alpha phase kubelet write-env-file --config {{ kubernetes_kubeadm_config_file_path }}/kubeadmenvconf.yaml
+  command: kubeadm init phase kubelet write-env-file --config {{ kubernetes_kubeadm_config_file_path }}/kubeadmenvconf.yaml
   changed_when: false
