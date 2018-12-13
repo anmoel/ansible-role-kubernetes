@@ -53,7 +53,7 @@
 - debug: var=master_preflight_register
 
 - name: initial at first master with started etcd
-  command: "kubeadm init --config {{ kubernetes_kubeadm_config_file }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379"
+  command: "kubeadm init --config {{ kubernetes_kubeadm_config_file }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379,Port-2380"
   when:
   - inventory_hostname == groups.k8s_masters[0]
   - inventory_hostname in groups.etcd

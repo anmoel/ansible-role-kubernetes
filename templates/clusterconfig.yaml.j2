@@ -51,9 +51,8 @@ apiServer:
   extraArgs:
     authorization-mode: {{ kubernetes_authorization_mode }}
     enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
-    auditLogDir: "{{ kubernetes_log_dir }}"
-    auditLogMaxAge: "{{ kubernetes_log_age }}"
-    auditPath: "{{ kubernetes_log_dir }}/api-server.log"
+    audit-log-maxage: "{{ kubernetes_log_age }}"
+    audit-log-path: "{{ kubernetes_audit_log_dir }}/api-server.log"
 {% if kubernetes_cloud_provider != "" %}
     cloud-provider: "{{ kubernetes_cloud_provider }}"
     cloud-config: "{{ kubernetes_cloud_config_file }}"

@@ -26,7 +26,8 @@ kubernetes_config_dir: /etc/kubernetes
 kubernetes_certs_dir: "{{ kubernetes_config_dir }}/pki"
 kubernetes_pod_manifest_path: '{{ kubernetes_config_dir }}/manifests'
 kubernetes_cluster_name: "kubernetes"
-kubernetes_log_dir: "/var/log/kubernetes/audit"
+kubernetes_log_dir: "/var/log/kubernetes"
+kubernetes_audit_log_dir: "{{ kubernetes_log_dir }}/audit"
 kubernetes_log_age: 2
 kubernetes_etcd_data_dir: "/var/etcd"
 kubernetes_authorization_mode: "Node,RBAC"

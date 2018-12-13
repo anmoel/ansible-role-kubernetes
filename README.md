@@ -54,7 +54,8 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_config_dir | "/etc/kubernetes" | Config path |
 | kubernetes_certs_dir | "{{ kubernetes_config_dir }}/pki" | certs folder |
 | kubernetes_pod_manifest_path | Absoulte path where static pod manifests will be stored | "{{ kubernetes_config_dir }}/manifests" |
-| kubernetes_log_dir | "/var/log/kubernetes/audit" | log folder |
+| kubernetes_log_dir | "{{ kubernetes_log_dir }}/audit" | log folder |
+| kubernetes_audit_log_dir | "/var/log/kubernetes/audit" | audit log folder |
 | kubernetes_log_age | 2 | max age of logfiles |
 | kubernetes_authorization_mode | "Node,RBAC" | kubernetes authorization mode |
 | kubernetes_enable_admission_plugins | "Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota" | kubernetes enabled admission plugins |
