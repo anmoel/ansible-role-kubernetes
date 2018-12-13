@@ -75,6 +75,7 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | Name | Default | Describtion |
 | --- | --- | --- |
 | kubernetes_apiserver_dns | `""` | dns-name for kubernetes apiserver |
+| kubernetes_apiserver_ip | - | virtual ip of kubernetes apiserver loadbalancer |
 | kubernetes_apiserver_port | `6443` | port of kubernetes apiserver |
 | kubernetes_apiserver_manifest_file | `'{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'` | Absolute path to manifest file |
 
