@@ -106,3 +106,6 @@ kubernetes_cloud_vsphere_default_password: ""
 kubernetes_cloud_vsphere_datacenters: []
 kubernetes_cloud_vsphere_network_options: []
 kubernetes_cloud_vsphere_disk_options: []
+
+#not use, changed in tasks
+all_etcd_on_master: false

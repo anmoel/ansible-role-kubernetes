@@ -19,14 +19,6 @@ etcd:
 {% for san in kubernetes_etcd_peer_cert_sans %}
     - {{ san }}
 {% endfor %}
-    extraArgs:
-      initial-cluster: {{ kubernetes_etcd_initial_cluster | join(",") }}
-      initial-cluster-state: new
-      name: {{ kubernetes_etcd_name }}
-      listen-peer-urls: {{ kubernetes_etcd_listen_peer_urls }}
-      listen-client-urls: {{ kubernetes_etcd_listen_client_urls }}
-      advertise-client-urls: {{ kubernetes_etcd_advertise_client_urls }}
-      initial-advertise-peer-urls: {{ kubernetes_etcd_initial_advertise_peer_urls }}
 {% else %}
   external:
     endpoints:

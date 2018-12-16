@@ -13,6 +13,7 @@
     - '{{ kubernetes_etcd_apiserver_client_cert_file }}'
     - '{{ kubernetes_etcd_apiserver_client_key_file }}'
   register: etcd_apiserver_certs_register
+  when: all_etcd_on_master == false
 
 - name: copy etcd cert files to master nodes
   copy:
@@ -21,12 +22,12 @@
   with_items:
     - "{{ etcd_ca_certs_register.results }}"
     - "{{ etcd_apiserver_certs_register.results }}"
+  when: all_etcd_on_master == false
 
 - name: run preflight checks
   command: kubeadm init phase preflight --config {{ kubernetes_kubeadm_config_file }}
   when:
   - inventory_hostname == groups.k8s_masters[0]
-  - inventory_hostname not in groups.etcd
   register: master_preflight_register
   changed_when: false
   failed_when: false
@@ -37,26 +38,6 @@
   command: "kubeadm init --config {{ kubernetes_kubeadm_config_file }}"
   when:
   - inventory_hostname == groups.k8s_masters[0]
-  - inventory_hostname not in groups.etcd
-  - master_preflight_register.rc == 0
-  register: init_output
-
-- name: run preflight checks
-  command: kubeadm init phase preflight --config {{ kubernetes_kubeadm_config_file }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379,Port-2380
-  when:
-  - inventory_hostname == groups.k8s_masters[0]
-  - inventory_hostname in groups.etcd
-  register: master_preflight_register
-  changed_when: false
-  failed_when: false
-
-- debug: var=master_preflight_register
-
-- name: initial at first master with started etcd
-  command: "kubeadm init --config {{ kubernetes_kubeadm_config_file }} --ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml,DirAvailable--var-etcd,Port-10250,Port-2379,Port-2380"
-  when:
-  - inventory_hostname == groups.k8s_masters[0]
-  - inventory_hostname in groups.etcd
   - master_preflight_register.rc == 0
   register: init_output
 

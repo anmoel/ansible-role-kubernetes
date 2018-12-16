@@ -1,4 +1,10 @@
 ---
+- name: check if etcd on first master
+  set_fact:
+    all_etcd_on_master: true
+  when: groups.etcd == groups.k8s_masters
+
+- debug: var=all_etcd_on_master
 
 - name: Load a variable file based on the OS type, or a default if not found. Using free-form to specify the file.
   include_vars: "{{ item }}"
@@ -53,13 +59,6 @@
   when:
   - inventory_hostname in groups.etcd
   - inventory_hostname not in groups.k8s_masters
-
-
-- name: include master with etcd prepare tasks
-  include_tasks: prepare_master_with_etcd.yml
-  when:
-    - inventory_hostname in groups.k8s_masters
-    - inventory_hostname in groups.etcd
 
 - name: include master tasks
   include_tasks: master.yml

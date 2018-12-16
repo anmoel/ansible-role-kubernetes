@@ -7,6 +7,8 @@
   with_items:
     - '{{ kubernetes_certs_dir }}/ca.crt'
     - '{{ kubernetes_certs_dir }}/ca.key'
+    - '{{ kubernetes_certs_dir }}/etcd/ca.crt'
+    - '{{ kubernetes_certs_dir }}/etcd/ca.key'
     - '{{ kubernetes_certs_dir }}/sa.key'
     - '{{ kubernetes_certs_dir }}/sa.pub'
     - '{{ kubernetes_certs_dir }}/front-proxy-ca.crt'
