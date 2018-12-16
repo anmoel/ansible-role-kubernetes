@@ -15,7 +15,7 @@
     - '{{ kubernetes_etcd_ca_key_file }}'
 
 - name: generate etcd-ca cert
-  command: kubeadm alpha phase certs etcd-ca --config={{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase certs etcd-ca --config={{ kubernetes_kubeadm_config_file }}
   when: "etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
   delegate_to: "{{ groups.etcd[0] }}"
   run_once: true
@@ -45,7 +45,7 @@
     - '{{ kubernetes_etcd_server_key_file }}'
 
 - name: generate etcd-server cert
-  command: kubeadm alpha phase certs etcd-server --config={{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase certs etcd-server --config={{ kubernetes_kubeadm_config_file }}
   when: "etcd_server_result.results[0].stat.exists == False and etcd_server_result.results[1].stat.exists == False"
 
 - name: 'check {{ kubernetes_etcd_peer_cert_file }} / {{ kubernetes_etcd_peer_key_file }} exists'
@@ -57,7 +57,7 @@
     - '{{ kubernetes_etcd_peer_key_file }}'
 
 - name: generate etcd-peer cert
-  command: kubeadm alpha phase certs etcd-peer --config={{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase certs etcd-peer --config={{ kubernetes_kubeadm_config_file }}
   when: "etcd_peer_result.results[0].stat.exists == False and etcd_peer_result.results[1].stat.exists == False"
 
 - name: 'check {{ kubernetes_etcd_healthcheck_client_cert_file }} / {{ kubernetes_etcd_healthcheck_client_key_file }} exists'
@@ -69,7 +69,7 @@
     - '{{ kubernetes_etcd_healthcheck_client_key_file }}'
 
 - name: generate etcd-healthcheck-client cert
-  command: kubeadm alpha phase certs etcd-healthcheck-client --config={{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase certs etcd-healthcheck-client --config={{ kubernetes_kubeadm_config_file }}
   when: "etcd_health_result.results[0].stat.exists == False and etcd_health_result.results[1].stat.exists == False"
 
 - name: 'check {{ kubernetes_etcd_apiserver_client_cert_file }} / {{ kubernetes_etcd_apiserver_client_key_file }} exists'
@@ -81,7 +81,7 @@
     - '{{ kubernetes_etcd_apiserver_client_key_file }}'
 
 - name: generate etcd-apiserver-etcd-client cert
-  command: kubeadm alpha phase certs apiserver-etcd-client --config={{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase certs apiserver-etcd-client --config={{ kubernetes_kubeadm_config_file }}
   when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
 
 - name: check {{ kubernetes_etcd_manifest_file }} exists
@@ -90,7 +90,7 @@
   register: stat_result
 
 - name: '{{ kubernetes_etcd_manifest_file }}'
-  command: kubeadm alpha phase etcd local --config={{ kubernetes_kubeadm_config_file }}
+  command: kubeadm init phase etcd local --config={{ kubernetes_kubeadm_config_file }}
   when: "stat_result.stat.exists == False"
   register: etcd_pod_result
 

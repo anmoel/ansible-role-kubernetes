@@ -48,11 +48,14 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_yum_arch | x86_64 | only redhat |
 | kubernetes_apt_repo_url | http://apt.kubernetes.io/ | only debian, kubernetes repository |
 | kubernetes_apt_repo_pool | kubernetes-xenial | only debian, kubernetes repository pool |
+| kubernetes_useHyperKubeImage | "false" | switch to change control-plane docker image to hyperkube |
+| kubernetes_dns_type | "CoreDNS" | dns plugin in kubernetes, could be: "kube-dns" or "CoreDNS" |
 | kubernetes_imageRepository | "k8s.gcr.io" | docker registry for kubernetes master components |
 | kubernetes_config_dir | "/etc/kubernetes" | Config path |
 | kubernetes_certs_dir | "{{ kubernetes_config_dir }}/pki" | certs folder |
 | kubernetes_pod_manifest_path | Absoulte path where static pod manifests will be stored | "{{ kubernetes_config_dir }}/manifests" |
-| kubernetes_log_dir | "/var/log/kubernetes/audit" | log folder |
+| kubernetes_log_dir | "{{ kubernetes_log_dir }}/audit" | log folder |
+| kubernetes_audit_log_dir | "/var/log/kubernetes/audit" | audit log folder |
 | kubernetes_log_age | 2 | max age of logfiles |
 | kubernetes_authorization_mode | "Node,RBAC" | kubernetes authorization mode |
 | kubernetes_enable_admission_plugins | "Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota" | kubernetes enabled admission plugins |
@@ -75,6 +78,7 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | Name | Default | Describtion |
 | --- | --- | --- |
 | kubernetes_apiserver_dns | `""` | dns-name for kubernetes apiserver |
+| kubernetes_apiserver_ip | - | virtual ip of kubernetes apiserver loadbalancer |
 | kubernetes_apiserver_port | `6443` | port of kubernetes apiserver |
 | kubernetes_apiserver_manifest_file | `'{{ kubernetes_pod_manifest_path }}/kube-apiserver.yaml'` | Absolute path to manifest file |
 
@@ -95,7 +99,6 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | kubernetes_etcd_apiserver_client_key_file | | `'{{ kubernetes_certs_dir }}/apiserver-etcd-client.key'` |
 | kubernetes_etcd_manifest_file | | `'{{ kubernetes_pod_manifest_path }}/etcd.yaml'` |
 | kubernetes_etcd_data_dir | folder for etcd data | `/var/etcd` |  |
-| kubernetes_etcd_image | image name for own etcd-container |  |
 | kubernetes_etcd_server_port | Etcd server communication port |  `2380` |
 | kubernetes_etcd_client_port | Etcd client communication port | `2379` |
 
