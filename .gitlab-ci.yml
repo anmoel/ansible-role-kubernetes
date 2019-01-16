@@ -1,0 +1,57 @@
+---
+stages:
+- linting
+- scenarios
+- cleanup
+
+image:  anmoel/alpine-ansible
+
+before_script:
+- mkdir /etc/ansible
+- printf '[defaults]\nroles_path=/builds/anmoel\nremote_user=gitlab\nprivate_key_file=/etc/ansible/id_rsa\nhost_key_checking=false\n' > /etc/ansible/ansible.cfg
+- ansible --version
+- ln -s /builds/anmoel/ansible-role-kubernetes /builds/anmoel/anmoel.kubernetes
+- echo "$ENCODED_SA_JSON" | base64 -d > /builds/anmoel/ansible-role-kubernetes/tests/serviceaccount.json
+- echo "$ENCODED_SSH_KEY" | base64 -d > /etc/ansible/id_rsa
+- git clone https://github.com/anmoel/ansible-role-docker.git /builds/anmoel/docker
+
+linting:
+  stage: linting
+  script:
+  - ansible-lint -v tests/site.yml --exclude=/builds/anmoel/docker
+  - ansible-playbook tests/site.yml -i tests/single_master/inventory --syntax-check
+
+allinone:
+  stage: scenarios
+  script:
+  - ansible-playbook tests/site.yml -v --diff -i tests/allinone/inventory
+
+single_master:
+  stage: scenarios
+  script:
+  - ansible-playbook tests/site.yml -v --diff -i tests/single_master/inventory
+
+seperated_etcd:
+  stage: scenarios
+  script:
+  - ansible-playbook tests/site.yml -v --diff -i tests/seperated_etcd/inventory
+
+master_ha:
+  stage: scenarios
+  script:
+  - ansible-playbook tests/site.yml -v --diff -i tests/master_ha/inventory
+
+ha_extended:
+  stage: scenarios
+  script:
+  - ansible-playbook tests/site.yml -v --diff -i tests/ha_extended/inventory
+
+cleanup_gcp:
+  stage: cleanup
+  script:
+    - ansible-playbook tests/gcp_cleanup.yml -v --diff -i tests/allinone/inventory
+    - ansible-playbook tests/gcp_cleanup.yml -v --diff -i tests/single_master/inventory
+    - ansible-playbook tests/gcp_cleanup.yml -v --diff -i tests/seperated_etcd/inventory
+    - ansible-playbook tests/gcp_cleanup.yml -v --diff -i tests/master_ha/inventory
+    - ansible-playbook tests/gcp_cleanup.yml -v --diff -i tests/ha_extended/inventory
+  when: always

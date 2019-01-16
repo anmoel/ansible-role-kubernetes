@@ -1,7 +1,12 @@
 ---
 
 - name: Ensure dependencies are installed.
-  package: name=curl state=present
+  package:
+    name: curl
+    state: present
+  register: task_result
+  until: task_result is success
+  retries: 2
 
 - name: Install Kubernetes packages
   package:
@@ -36,4 +41,7 @@
 - name: install docker-py
   pip:
     name: docker-py
+  register: task_result
+  until: task_result is success
+  retries: 2
   when: inventory_hostname in groups.etcd

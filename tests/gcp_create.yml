@@ -1,0 +1,43 @@
+---
+
+- name: create vms
+  hosts: all
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: create instances
+    delegate_to: localhost
+    gce:
+      instance_names: "{{ inventory_hostname }}"
+      zone: "{{ gcp_zone }}"
+      machine_type: "{{ type }}"
+      image: "{{ image }}"
+      state: present
+      service_account_email: "{{ lookup('env','GCP_SA_EMAIL') }}"
+      credentials_file: "./serviceaccount.json"
+      service_account_permissions:
+      - compute-rw
+      project_id: "{{ lookup('env','GCP_PROJECT_ID') }}"
+      disk_size: 10
+    register: gce_info
+
+  - name: set fact public_ip
+    set_fact: public_ip={{ gce_info.instance_data[0].public_ip }}
+
+  - name: set fact private_ip
+    set_fact: private_ip={{ gce_info.instance_data[0].private_ip }}
+
+  - name: set fact ansible_host
+    set_fact: ansible_host={{ public_ip }}
+
+  - name: set fact kubernetes_apiserver_ip
+    set_fact: public_ip={{ gce_info.instance_data[0].public_ip }}
+    when: groups.k8s_masters | length > 1 and inventory_hostname == groups.k8s_masters[0]
+
+  - name: Wait for SSH to come up
+    delegate_to: localhost
+    wait_for: host={{ public_ip }} port=22 delay=10 timeout=60 state=started
+
+  - name: Wait additional 15 seconds for user scripts
+    delegate_to: localhost
+    pause: seconds=15

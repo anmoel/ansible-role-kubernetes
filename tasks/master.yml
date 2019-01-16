@@ -5,7 +5,9 @@
     state: directory
     path: '{{ kubernetes_etcd_certs_dir }}'
 
-- name: get {{ kubernetes_etcd_apiserver_client_key_file }} and {{ kubernetes_etcd_apiserver_client_key_file }} files from first etcd node
+- name: >
+    get {{ kubernetes_etcd_apiserver_client_key_file }} and
+     {{ kubernetes_etcd_apiserver_client_key_file }} files from first etcd node
   delegate_to: "{{ groups.etcd[0] }}"
   slurp:
     src: "{{ item }}"
@@ -13,7 +15,7 @@
     - '{{ kubernetes_etcd_apiserver_client_cert_file }}'
     - '{{ kubernetes_etcd_apiserver_client_key_file }}'
   register: etcd_apiserver_certs_register
-  when: all_etcd_on_master == false
+  when: not all_etcd_on_master
 
 - name: copy etcd cert files to master nodes
   copy:
@@ -22,7 +24,7 @@
   with_items:
     - "{{ etcd_ca_certs_register.results }}"
     - "{{ etcd_apiserver_certs_register.results }}"
-  when: all_etcd_on_master == false
+  when: not all_etcd_on_master
 
 - name: run preflight checks
   command: kubeadm init phase preflight --config {{ kubernetes_kubeadm_config_file }}

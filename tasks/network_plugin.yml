@@ -1,11 +1,15 @@
 ---
 
 - name: "deploy canal network plugin #1"
-  command: "kubectl apply --kubeconfig {{ kubernetes_config_dir }}/admin.conf -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/rbac.yaml"
+  command: >
+    kubectl apply --kubeconfig {{ kubernetes_config_dir }}/admin.conf -f
+     https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/rbac.yaml
   register: canal_rbac_register
   changed_when: canal_rbac_register.stdout is search("created")
 
 - name: "deploy canal network plugin #2"
-  command: "kubectl apply --kubeconfig {{ kubernetes_config_dir }}/admin.conf -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/canal.yaml"
+  command: >
+    kubectl apply --kubeconfig {{ kubernetes_config_dir }}/admin.conf -f
+     https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/canal.yaml
   register: canal_daemonset_register
   changed_when: canal_daemonset_register.stdout is search("created")

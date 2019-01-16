@@ -17,6 +17,8 @@
     key: "{{ item }}"
     state: present
   register: kubernetes_rpm_key
+  until: kubernetes_rpm_key is success
+  retries: 2
   with_items:
     - https://packages.cloud.google.com/yum/doc/yum-key.gpg
     - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg

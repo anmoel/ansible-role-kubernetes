@@ -1,0 +1,23 @@
+[kubernetes:children]
+etcd
+k8s_masters
+k8s_nodes
+
+[kubernetes:vars]
+docker_version="18.06.0"
+gcp_lb_name="he-k8s-lb"
+gcp_zone="us-west1-b"
+gcp_region="us-west1"
+
+[etcd]
+he-etcd-01 type=n1-standard-1 image=ubuntu-1804-bionic
+he-etcd-02 type=n1-standard-1 image=ubuntu-1804-bionic
+he-etcd-03 type=n1-standard-1 image=ubuntu-1804-bionic
+
+[k8s_masters]
+he-k8s-master-01 type=n1-standard-2 image=ubuntu-1804-bionic
+he-k8s-master-02 type=n1-standard-2 image=ubuntu-1804-bionic
+he-k8s-master-03 type=n1-standard-2 image=ubuntu-1804-bionic
+
+[k8s_nodes]
+he-k8s-worker-01 type=n1-standard-1 image=centos-7

@@ -5,15 +5,15 @@ k8s_nodes
 
 [kubernetes:vars]
 docker_version="18.06.0"
-gcp_lb_name="sm-k8s-lb"
+gcp_lb_name="aio-k8s-lb"
 gcp_zone="us-east1-b"
 gcp_region="us-east1"
 
 [etcd]
-sm-k8s-master-01
+aio-k8s-master-01
 
 [k8s_masters]
-sm-k8s-master-01 type=n1-standard-2 image=ubuntu-1804-bionic
+aio-k8s-master-01 type=n1-standard-2 image=ubuntu-1804-bionic
 
 [k8s_nodes]
-sm-k8s-worker-01 type=n1-standard-1 image=centos-7
+aio-k8s-master-01

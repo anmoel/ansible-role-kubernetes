@@ -1,6 +1,9 @@
 Ansible Role: Kubernetes
 ==========
 
+[![pipeline status](https://gitlab.com/anmoel/ansible-role-kubernetes/badges/master/pipeline.svg)](https://gitlab.com/anmoel/ansible-role-kubernetes/commits/master)
+[![coverage report](https://gitlab.com/anmoel/ansible-role-kubernetes/badges/master/coverage.svg)](https://gitlab.com/anmoel/ansible-role-kubernetes/commits/master)
+
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Introduction](#introduction)
@@ -43,8 +46,8 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 | Name | Default | Describtion |
 |:-----|:--------|:------------|
 | kubernetes_cluster_name | "kubernetes" | kubernetes cluster name |
-| kubernetes_master_version | "v1.12.2" | This is the version of the kubernetes master components |
-| kubernetes_version_rhel_package | '1.12.2' | only redhat, version of kubectl,kubeadm,kubelet |
+| kubernetes_master_version | "v1.13.2" | This is the version of the kubernetes master components |
+| kubernetes_version_rhel_package | '1.13.2' | only redhat, version of kubectl,kubeadm,kubelet |
 | kubernetes_yum_arch | x86_64 | only redhat |
 | kubernetes_apt_repo_url | http://apt.kubernetes.io/ | only debian, kubernetes repository |
 | kubernetes_apt_repo_pool | kubernetes-xenial | only debian, kubernetes repository pool |
@@ -140,30 +143,38 @@ An Ansible Role that installs [Kubernetes](https://kubernetes.io) on Linux.
 # Example Playbooks
 
 There is an Vagrantfile to create all servers for all szenarios:
-[Vagrantfile](./tests/Vagrantfile)
-[servers.yml](./tests/servers.yml) (needed for Vagrantfile)
+[Vagrantfile](./tests/vagrant/Vagrantfile)
+[servers.yml](./tests/vagrant/servers.yml) (needed for Vagrantfile)
+
+## AllinOne
+
+[inventory](./tests/allinone/inventory)
+
+[site.yml](./tests/site.yml)
 
 ## Single Master-Cluster
 
 [inventory](./tests/single_master/inventory)
 
-[site.yml](./tests/single_master/site.yml)
+[site.yml](./tests/site.yml)
+
+## seperated etcd, single Master Cluster
+
+[inventory](./tests/seperated_etcd/inventory)
+
+[site.yml](./tests/site.yml)
 
 ## HA-Master-Cluster
 
 [inventory](./tests/master_ha/inventory)
 
-[group_vars/k8s_masters](./tests/master_ha/group_vars/k8s_masters)
-
-[site.yml](./tests/master_ha/site.yml)
+[site.yml](./tests/site.yml)
 
 ## seperated etcd, HA Master Cluster
 
-[inventory](./tests/seperated_etcd/inventory)
+[inventory](./tests/ha_extended/inventory)
 
-[group_vars/k8s_masters](./tests/seperated_etcd/group_vars/k8s_masters)
-
-[site.yml](./tests/seperated_etcd/site.yml)
+[site.yml](./tests/site.yml)
 
 # License
 

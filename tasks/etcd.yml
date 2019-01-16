@@ -9,14 +9,14 @@
   stat:
     path: "{{ item }}"
   register: etcd_ca_result
-  when: "inventory_hostname == groups.etcd[0]"
+  when: inventory_hostname == groups.etcd[0]
   with_items:
     - '{{ kubernetes_etcd_ca_cert_file }}'
     - '{{ kubernetes_etcd_ca_key_file }}'
 
 - name: generate etcd-ca cert
   command: kubeadm init phase certs etcd-ca --config={{ kubernetes_kubeadm_config_file }}
-  when: "etcd_ca_result.results[0].stat.exists == False and etcd_ca_result.results[1].stat.exists == False"
+  when: not etcd_ca_result.results[0].stat.exists and not etcd_ca_result.results[1].stat.exists
   delegate_to: "{{ groups.etcd[0] }}"
   run_once: true
 
@@ -46,7 +46,7 @@
 
 - name: generate etcd-server cert
   command: kubeadm init phase certs etcd-server --config={{ kubernetes_kubeadm_config_file }}
-  when: "etcd_server_result.results[0].stat.exists == False and etcd_server_result.results[1].stat.exists == False"
+  when: not etcd_server_result.results[0].stat.exists and not etcd_server_result.results[1].stat.exists
 
 - name: 'check {{ kubernetes_etcd_peer_cert_file }} / {{ kubernetes_etcd_peer_key_file }} exists'
   stat:
@@ -58,9 +58,11 @@
 
 - name: generate etcd-peer cert
   command: kubeadm init phase certs etcd-peer --config={{ kubernetes_kubeadm_config_file }}
-  when: "etcd_peer_result.results[0].stat.exists == False and etcd_peer_result.results[1].stat.exists == False"
+  when: "not etcd_peer_result.results[0].stat.exists and not etcd_peer_result.results[1].stat.exists"
 
-- name: 'check {{ kubernetes_etcd_healthcheck_client_cert_file }} / {{ kubernetes_etcd_healthcheck_client_key_file }} exists'
+- name: >
+    check {{ kubernetes_etcd_healthcheck_client_cert_file }} /
+     {{ kubernetes_etcd_healthcheck_client_key_file }} exists
   stat:
     path: "{{ item }}"
   register: etcd_health_result
@@ -70,9 +72,13 @@
 
 - name: generate etcd-healthcheck-client cert
   command: kubeadm init phase certs etcd-healthcheck-client --config={{ kubernetes_kubeadm_config_file }}
-  when: "etcd_health_result.results[0].stat.exists == False and etcd_health_result.results[1].stat.exists == False"
+  when:
+  - not etcd_health_result.results[0].stat.exists
+  - not etcd_health_result.results[1].stat.exists
 
-- name: 'check {{ kubernetes_etcd_apiserver_client_cert_file }} / {{ kubernetes_etcd_apiserver_client_key_file }} exists'
+- name: >
+    check {{ kubernetes_etcd_apiserver_client_cert_file }} /
+     {{ kubernetes_etcd_apiserver_client_key_file }} exists
   stat:
     path: "{{ item }}"
   register: etcd_apiclient_result
@@ -82,7 +88,9 @@
 
 - name: generate etcd-apiserver-etcd-client cert
   command: kubeadm init phase certs apiserver-etcd-client --config={{ kubernetes_kubeadm_config_file }}
-  when: "etcd_apiclient_result.results[0].stat.exists == False and etcd_apiclient_result.results[1].stat.exists == False"
+  when:
+  - not etcd_apiclient_result.results[0].stat.exists
+  - not etcd_apiclient_result.results[1].stat.exists
 
 - name: check {{ kubernetes_etcd_manifest_file }} exists
   stat:
@@ -91,7 +99,7 @@
 
 - name: '{{ kubernetes_etcd_manifest_file }}'
   command: kubeadm init phase etcd local --config={{ kubernetes_kubeadm_config_file }}
-  when: "stat_result.stat.exists == False"
+  when: "not stat_result.stat.exists"
   register: etcd_pod_result
 
 - name: ensure right kubelet systemd file exists
@@ -99,7 +107,7 @@
     src: init_etcd_kubelet.service.d.j2
     dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
   register: kubelet_config_file
-  when: "stat_result.stat.exists == False"
+  when: "not stat_result.stat.exists"
 
 - name: Reload systemd unit if args were changed.
   systemd:
@@ -127,5 +135,10 @@
     detach: no
     volumes:
       - '{{ kubernetes_config_dir }}:/etc/kubernetes'
-    command: "etcdctl --cert-file {{ kubernetes_etcd_peer_cert_file }} --key-file {{ kubernetes_etcd_peer_key_file }} --ca-file {{ kubernetes_etcd_ca_cert_file }} --endpoints https://{{ ansible_host | default(ansible_default_ipv4.address) }}:{{ kubernetes_etcd_client_port }} cluster-health"
+    command: >
+      etcdctl --cert-file {{ kubernetes_etcd_peer_cert_file }}
+       --key-file {{ kubernetes_etcd_peer_key_file }}
+       --ca-file {{ kubernetes_etcd_ca_cert_file }}
+       --endpoints https://{{ ansible_host | default(ansible_default_ipv4.address) }}:{{ kubernetes_etcd_client_port }}
+       cluster-health
   changed_when: False

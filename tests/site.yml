@@ -1,5 +1,7 @@
 ---
 
+- import_playbook: ./gcp_create.yml
+
 - hosts: kubernetes
   become: true
   become_user: root
@@ -7,10 +9,13 @@
   tasks:
   - name: install python 2
     raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    changed_when: false
 
 - hosts: kubernetes
   become: true
   become_user: root
   roles:
-    - geerlingguy.docker
+    - docker
     - anmoel.kubernetes
+
+- import_playbook: ./gcp_cleanup.yml

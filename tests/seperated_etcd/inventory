@@ -5,15 +5,15 @@ k8s_nodes
 
 [kubernetes:vars]
 docker_version="18.06.0"
+gcp_lb_name="se-k8s-lb"
+gcp_zone="us-east1-b"
+gcp_region="us-east1"
 
 [etcd]
-etcd-01 ansible_host=192.168.10.110 ansible_user=vagrant
-etcd-02 ansible_host=192.168.10.111 ansible_user=vagrant
-etcd-03 ansible_host=192.168.10.112 ansible_user=vagrant
+se-etcd-01 type=n1-standard-1 image=ubuntu-1804-bionic
 
 [k8s_masters]
-k8s-master-01 ansible_host=192.168.10.121 ansible_user=vagrant
-k8s-master-02 ansible_host=192.168.10.122 ansible_user=vagrant
+se-k8s-master-01 type=n1-standard-2 image=centos-7
 
 [k8s_nodes]
-k8s-worker-01 ansible_host=192.168.10.130 ansible_user=vagrant
+se-k8s-worker-01 type=n1-standard-1 image=centos-7

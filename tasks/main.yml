@@ -38,7 +38,7 @@
   template:
     src: cloud.conf.j2
     dest: "{{ kubernetes_cloud_config_file }}"
-  when: kubernetes_cloud_provider != ""
+  when: kubernetes_cloud_provider | length > 0
 
 - name: ensure kubelet env KUBELET_EXTRA_ARGS is set
   lineinfile:
@@ -88,6 +88,5 @@
 
 - name: print cluster-state
   debug:
-    var: "{{ item }}"
-  with_items: "cluster_state_register.stdout_lines"
+    var: cluster_state_register.stdout
   when: inventory_hostname == groups.k8s_masters[0]
