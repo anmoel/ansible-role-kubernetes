@@ -6,8 +6,8 @@ k8s_nodes
 [kubernetes:vars]
 docker_version="18.06.0"
 gcp_lb_name="sm-k8s-lb"
-gcp_zone="us-east1-b"
-gcp_region="us-east1"
+gcp_zone="europe-west4-b"
+gcp_region="europe-west4"
 
 [etcd]
 sm-k8s-master-01

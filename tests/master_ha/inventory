@@ -6,8 +6,8 @@ k8s_nodes
 [kubernetes:vars]
 docker_version="18.06.0"
 gcp_lb_name="mh-k8s-lb"
-gcp_zone="us-central1-b"
-gcp_region="us-central1"
+gcp_zone="europe-west4-b"
+gcp_region="europe-west4"
 
 [etcd]
 mh-k8s-master-01 type=n1-standard-2 image=ubuntu-1804-bionic
