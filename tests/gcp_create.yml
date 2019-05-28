@@ -38,9 +38,4 @@
     when: groups.k8s_masters | length > 1 and inventory_hostname == groups.k8s_masters[0]
 
   - name: Wait for SSH to come up
-    delegate_to: localhost
-    wait_for: host={{ public_ip }} port=22 delay=10 timeout=60 state=started
-
-  - name: Wait additional 15 seconds for user scripts
-    delegate_to: localhost
-    pause: seconds=15
+    wait_for_connection:
