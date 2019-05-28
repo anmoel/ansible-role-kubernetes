@@ -30,9 +30,6 @@
   - name: set fact ansible_host
     set_fact: ansible_host={{ public_ip }}
 
-  - name: set fact ansible_user
-    set_fact: ansible_user={{ lookup('env','GCP_USER') }}
-
   - name: set fact kubernetes_apiserver_ip
     set_fact: public_ip={{ gce_info.instance_data[0].public_ip }}
     when: groups.k8s_masters | length > 1 and inventory_hostname == groups.k8s_masters[0]
