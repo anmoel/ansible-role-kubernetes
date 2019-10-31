@@ -1,0 +1,20 @@
+name: Ansible Playbook tests
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: ansible lint
+        uses: ansible/ansible-lint-action@master
+        with:
+          targets: "tests/site.yml"
+          args: "-v --exclude=/builds/anmoel/docker"
+      - name: ansible syntax check
+        uses: ./.github/actions/ansible-playbook
+        with:
+          playbook: tests/site.yml
+          inventory: tests/single_master/inventory
+          options: --syntax-check
