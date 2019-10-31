@@ -4,19 +4,45 @@
   gather_facts: no
   connection: local
   tasks:
-    - name: create instances
-      delegate_to: localhost
+    - name: create a disk
+      gcp_compute_disk:
+        name: "disk-instance-{{ inventory_hostname }}"
+        size_gb: 20
+        source_image: "{{ image }}"
+        zone: "{{ gcp_zone }}"
+        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
+        auth_kind: serviceaccount
+        service_account_file: "./serviceaccount.json"
+        state: present
+      register: disk
+    - name: create a address
+      gcp_compute_address:
+        name: "address-instance-{{ inventory_hostname }}"
+        region: "{{ gcp_region }}"
+        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
+        auth_kind: serviceaccount
+        service_account_file: "./serviceaccount.json"
+        state: present
+      register: address
+    - name: create a instance
       gcp_compute_instance:
         name: "{{ inventory_hostname }}"
         machine_type: "{{ type }}"
+        disks:
+          - auto_delete: "true"
+            boot: "true"
+            source: "{{ disk }}"
+        network_interfaces:
+          - network: "default"
+            access_configs:
+              - name: External NAT
+                nat_ip: "{{ address }}"
+                type: ONE_TO_ONE_NAT
         zone: "{{ gcp_zone }}"
-        image: "{{ image }}"
         project: "{{ lookup('env','GCP_PROJECT_ID') }}"
-        auth_kind: "service_account_file"
+        auth_kind: serviceaccount
         service_account_file: "./serviceaccount.json"
         state: present
-      register: gce_info
-
     # - name: create instances
     #   delegate_to: localhost
     #   gce:
