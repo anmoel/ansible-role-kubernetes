@@ -26,13 +26,8 @@ jobs:
           ENCODED_SA_JSON: ${{ secrets.ENCODED_SA_JSON }}
           ENCODED_SSH_KEY: ${{ secrets.ENCODED_SSH_KEY }}
       - name: ansible lint
-        uses: ansible/ansible-lint-action@master
-        with:
-          targets: "ansible-role-kubernetes/anmoel.kubernetes/tests/site.yml"
-          args: ""
+        run: |
+          ansible-lint -v ${GITHUB_WORKSPACE}/tests/site.yml --exclude=ansible-role-kubernetes/docker
       - name: ansible syntax check
-        uses: ./.github/actions/ansible-playbook
-        with:
-          playbook: "ansible-role-kubernetes/anmoel.kubernetes/tests/site.yml"
-          inventory: "ansible-role-kubernetes/anmoel.kubernetes/tests/single_master/inventory"
-          options: --syntax-check
+        run: |
+          ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -i ${GITHUB_WORKSPACE}/tests/single_master/inventory --syntax-check
