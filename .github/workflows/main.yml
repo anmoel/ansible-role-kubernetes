@@ -22,6 +22,7 @@ jobs:
           echo "$ENCODED_SSH_KEY" | base64 -d > /etc/ansible/id_rsa
         env: # Or as an environment variable
           ENCODED_SA_JSON: ${{ secrets.ENCODED_SA_JSON }}
+          ENCODED_SSH_KEY: ${{ secrets.ENCODED_SSH_KEY }}
       - name: ansible lint
         uses: ansible/ansible-lint-action@master
         with:
