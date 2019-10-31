@@ -17,6 +17,7 @@ jobs:
           path: docker
       - name: prepare
         run: |
+          ansible --version
           printf '[defaults]\nroles_path=/home/runner/work/ansible-role-kubernetes\nremote_user=gitlab\nprivate_key_file=~/id_rsa\nhost_key_checking=false\n' > ${HOME}/ansible.cfg
           echo ${GITHUB_WORKSPACE}
           echo "$ENCODED_SA_JSON" | base64 -d > ${GITHUB_WORKSPACE}/tests/serviceaccount.json
