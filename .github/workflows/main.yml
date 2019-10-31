@@ -25,7 +25,7 @@ jobs:
         env: # Or as an environment variable
           ENCODED_SA_JSON: ${{ secrets.ENCODED_SA_JSON }}
           ENCODED_SSH_KEY: ${{ secrets.ENCODED_SSH_KEY }}
-       - name: ansible lint
+      - name: ansible lint
         uses: ansible/ansible-lint-action@master
         with:
           targets: "tests/site.yml"
