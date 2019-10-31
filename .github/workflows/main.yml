@@ -18,6 +18,7 @@ jobs:
       - name: prepare
         run: |
           printf '[defaults]\nroles_path=/home/runner/work/ansible-role-kubernetes\nremote_user=gitlab\nprivate_key_file=~/id_rsa\nhost_key_checking=false\n' > ${HOME}/ansible.cfg
+          echo ${GITHUB_WORKSPACE}
           echo "$ENCODED_SA_JSON" | base64 -d > ${GITHUB_WORKSPACE}/tests/serviceaccount.json
           echo "$ENCODED_SSH_KEY" | base64 -d > ${HOME}/id_rsa
         env: # Or as an environment variable
@@ -26,11 +27,11 @@ jobs:
       - name: ansible lint
         uses: ansible/ansible-lint-action@master
         with:
-          targets: "tests/site.yml"
+          targets: "ansible-role-kubernetes/anmoel.kubernetes/tests/site.yml"
           args: ""
       - name: ansible syntax check
         uses: ./.github/actions/ansible-playbook
         with:
-          playbook: tests/site.yml
-          inventory: tests/single_master/inventory
+          playbook: "ansible-role-kubernetes/anmoel.kubernetes/tests/site.yml"
+          inventory: "ansible-role-kubernetes/anmoel.kubernetes/tests/single_master/inventory"
           options: --syntax-check
