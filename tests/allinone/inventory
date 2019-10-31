@@ -13,7 +13,7 @@ gcp_region="europe-west4"
 aio-k8s-master-01
 
 [k8s_masters]
-aio-k8s-master-01 type=n1-standard-2 image=ubuntu-1804-bionic
+aio-k8s-master-01 type=n1-standard-2 image=projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts
 
 [k8s_nodes]
 aio-k8s-master-01
