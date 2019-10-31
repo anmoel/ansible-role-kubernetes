@@ -17,6 +17,7 @@ inputs:
 runs:
   using: "docker"
   image: "anmoel/alpine-ansible"
+  entrypoint: "ansible-playbook"
   args:
     - ${{ inputs.playbook }}
     - -i ${{ inputs.inventory }}
