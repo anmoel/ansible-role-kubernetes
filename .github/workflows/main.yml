@@ -17,7 +17,6 @@ jobs:
           path: docker
       - name: prepare
         run: |
-          apt-get upgrade -y
           ansible --version
           printf '[defaults]\nroles_path=/home/runner/work/ansible-role-kubernetes\nremote_user=gitlab\nprivate_key_file=~/id_rsa\nhost_key_checking=false\n' > ${HOME}/.ansible.cfg
           echo ${GITHUB_WORKSPACE}
@@ -49,6 +48,8 @@ jobs:
           path: docker
       - name: prepare
         run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
           ansible --version
           printf '[defaults]\nroles_path=/home/runner/work/ansible-role-kubernetes\nremote_user=gitlab\nprivate_key_file=~/id_rsa\nhost_key_checking=false\n' > ${HOME}/.ansible.cfg
           echo ${GITHUB_WORKSPACE}
