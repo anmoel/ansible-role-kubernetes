@@ -16,7 +16,7 @@ inputs:
     default: ""
 runs:
   using: "docker"
-  image: "anmoel/docker-alpine-ansible"
+  image: "anmoel/alpine-ansible"
   args:
     - ${{ inputs.playbook }}
     - -i ${{ inputs.inventory }}
