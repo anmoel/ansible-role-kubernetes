@@ -1,18 +1,26 @@
 ---
-
 - name: delete vms
   hosts: all
   gather_facts: no
   connection: local
   tasks:
-  - name: destroy instances
-    delegate_to: localhost
-    gce:
-      instance_names: "{{ inventory_hostname }}"
-      zone: "{{ gcp_zone }}"
-      state: absent
-      service_account_email: "{{ lookup('env','GCP_SA_EMAIL') }}"
-      credentials_file: "./serviceaccount.json"
-      service_account_permissions:
-      - compute-rw
-      project_id: "{{ lookup('env','GCP_PROJECT_ID') }}"
+    - name: destroy instances
+      delegate_to: localhost
+      gcp_compute_instance:
+        name: "{{ inventory_hostname }}"
+        zone: "{{ gcp_zone }}"
+        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
+        auth_kind: "service_account_file"
+        service_account_file: "./serviceaccount.json"
+        state: absent
+  # - name: destroy instances
+  #   delegate_to: localhost
+  #   gce:
+  #     instance_names: "{{ inventory_hostname }}"
+  #     zone: "{{ gcp_zone }}"
+  #     state: absent
+  #     service_account_email: "{{ lookup('env','GCP_SA_EMAIL') }}"
+  #     credentials_file: "./serviceaccount.json"
+  #     service_account_permissions:
+  #     - compute-rw
+  #     project_id: "{{ lookup('env','GCP_PROJECT_ID') }}"
