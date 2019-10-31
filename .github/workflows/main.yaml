@@ -11,7 +11,7 @@ jobs:
         uses: ansible/ansible-lint-action@master
         with:
           targets: "tests/site.yml"
-          args: "-v --exclude=/builds/anmoel/docker"
+          args: ""
       - name: ansible syntax check
         uses: ./.github/actions/ansible-playbook
         with:
