@@ -35,6 +35,8 @@ jobs:
           ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -i ${GITHUB_WORKSPACE}/tests/single_master/inventory --syntax-check
   all-in-one:
     runs-on: ubuntu-latest
+    container:
+      image: "anmoel/alpine-ansible"
     steps:
       - name: checkout
         uses: actions/checkout@v1
