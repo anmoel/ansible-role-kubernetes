@@ -3,6 +3,10 @@
   hosts: all
   gather_facts: no
   connection: local
+  vars:
+    gcp_project: "{{ lookup('env','GCP_PROJECT_ID') }}"
+    gcp_cred_kind: serviceaccount
+    gcp_cred_file: "./serviceaccount.json"
   tasks:
     - name: create a disk
       gcp_compute_disk:
@@ -10,17 +14,17 @@
         size_gb: 10
         source_image: "{{ image }}"
         zone: "{{ gcp_zone }}"
-        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
-        auth_kind: serviceaccount
-        service_account_file: "./serviceaccount.json"
+        project: "{{ gcp_project }}"
+        auth_kind: "{{ gcp_cred_kind }}"
+        service_account_file: "{{ gcp_cred_file }}"
         state: present
       register: disk
     - name: create a network
       gcp_compute_network:
         name: "default"
-        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
-        auth_kind: serviceaccount
-        service_account_file: "./serviceaccount.json"
+        project: "{{ gcp_project }}"
+        auth_kind: "{{ gcp_cred_kind }}"
+        service_account_file: "{{ gcp_cred_file }}"
         scopes:
           - https://www.googleapis.com/auth/compute
         state: present
@@ -29,9 +33,9 @@
       gcp_compute_address:
         name: "address-instance-{{ inventory_hostname }}"
         region: "{{ gcp_region }}"
-        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
-        auth_kind: serviceaccount
-        service_account_file: "./serviceaccount.json"
+        project: "{{ gcp_project }}"
+        auth_kind: "{{ gcp_cred_kind }}"
+        service_account_file: "{{ gcp_cred_file }}"
         state: present
       register: address
     - name: create a instance
@@ -49,9 +53,9 @@
                 nat_ip: "{{ address }}"
                 type: ONE_TO_ONE_NAT
         zone: "{{ gcp_zone }}"
-        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
-        auth_kind: serviceaccount
-        service_account_file: "./serviceaccount.json"
+        project: "{{ gcp_project }}"
+        auth_kind: "{{ gcp_cred_kind }}"
+        service_account_file: "{{ gcp_cred_file }}"
         state: present
     # - name: create instances
     #   delegate_to: localhost
