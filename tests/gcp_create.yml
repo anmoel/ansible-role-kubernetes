@@ -15,6 +15,16 @@
         service_account_file: "./serviceaccount.json"
         state: present
       register: disk
+    - name: create a network
+      gcp_compute_network:
+        name: "default"
+        project: "{{ lookup('env','GCP_PROJECT_ID') }}"
+        auth_kind: serviceaccount
+        service_account_file: "./serviceaccount.json"
+        scopes:
+          - https://www.googleapis.com/auth/compute
+        state: present
+      register: network
     - name: create a address
       gcp_compute_address:
         name: "address-instance-{{ inventory_hostname }}"
