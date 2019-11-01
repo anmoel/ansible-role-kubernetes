@@ -60,5 +60,5 @@ jobs:
           ENCODED_SSH_KEY: ${{ secrets.ENCODED_SSH_KEY }}
       - name: run ansible-playbook
         run: |
-          run: |
+          ls -la /home/runner/work/ansible-role-kubernetes
           ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -v --diff -i ${GITHUB_WORKSPACE}/tests/allinone/inventory
