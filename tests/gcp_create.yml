@@ -74,16 +74,16 @@
       register: gce_info
 
     - name: set fact public_ip
-      set_fact: public_ip={{ gce_info.networkInterfaces[0].accessConfigs[0].natIP }}
+      set_fact: public_ip={{ gce_info.instance_data[0].public_ip }}
 
     - name: set fact private_ip
-      set_fact: private_ip={{ gce_info.networkInterfaces[0].networkIP }}
+      set_fact: private_ip={{ gce_info.instance_data[0].private_ip }}
 
     - name: set fact ansible_host
       set_fact: ansible_host={{ public_ip }}
 
     - name: set fact kubernetes_apiserver_ip
-      set_fact: kubernetes_apiserver_ip={{ gce_info.networkInterfaces[0].accessConfigs[0].natIP }}
+      set_fact: kubernetes_apiserver_ip={{ gce_info.instance_data[0].public_ip }}
       when: groups.k8s_masters | length > 1 and inventory_hostname == groups.k8s_masters[0]
 
     - name: Wait for SSH to come up
