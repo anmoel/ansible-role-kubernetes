@@ -3,75 +3,75 @@
   hosts: all
   gather_facts: no
   connection: local
-  vars:
-    gcp_project: "{{ lookup('env','GCP_PROJECT_ID') }}"
-    gcp_cred_kind: serviceaccount
-    gcp_cred_file: "./serviceaccount.json"
+  # vars:
+  #   gcp_project: "{{ lookup('env','GCP_PROJECT_ID') }}"
+  #   gcp_cred_kind: serviceaccount
+  #   gcp_cred_file: "./serviceaccount.json"
   tasks:
-    - name: create a disk
-      gcp_compute_disk:
-        name: "disk-instance-{{ inventory_hostname }}"
-        size_gb: 10
-        source_image: "{{ image }}"
-        zone: "{{ gcp_zone }}"
-        project: "{{ gcp_project }}"
-        auth_kind: "{{ gcp_cred_kind }}"
-        service_account_file: "{{ gcp_cred_file }}"
-        state: present
-      register: disk
-    - name: create a network
-      gcp_compute_network:
-        name: "default"
-        project: "{{ gcp_project }}"
-        auth_kind: "{{ gcp_cred_kind }}"
-        service_account_file: "{{ gcp_cred_file }}"
-        scopes:
-          - https://www.googleapis.com/auth/compute
-        state: present
-      register: network
-    - name: create a address
-      gcp_compute_address:
-        name: "address-instance-{{ inventory_hostname }}"
-        region: "{{ gcp_region }}"
-        project: "{{ gcp_project }}"
-        auth_kind: "{{ gcp_cred_kind }}"
-        service_account_file: "{{ gcp_cred_file }}"
-        state: present
-      register: address
-    - name: create a instance
-      gcp_compute_instance:
-        name: "{{ inventory_hostname }}"
-        machine_type: "{{ type }}"
-        disks:
-          - auto_delete: "true"
-            boot: "true"
-            source: "{{ disk }}"
-        network_interfaces:
-          - network: "{{ network }}"
-            access_configs:
-              - name: External NAT
-                nat_ip: "{{ address }}"
-                type: ONE_TO_ONE_NAT
-        zone: "{{ gcp_zone }}"
-        project: "{{ gcp_project }}"
-        auth_kind: "{{ gcp_cred_kind }}"
-        service_account_file: "{{ gcp_cred_file }}"
-        state: present
-    # - name: create instances
-    #   delegate_to: localhost
-    #   gce:
-    #     instance_names: "{{ inventory_hostname }}"
+    # - name: create a disk
+    #   gcp_compute_disk:
+    #     name: "disk-instance-{{ inventory_hostname }}"
+    #     size_gb: 10
+    #     source_image: "{{ image }}"
     #     zone: "{{ gcp_zone }}"
-    #     machine_type: "{{ type }}"
-    #     image: "{{ image }}"
+    #     project: "{{ gcp_project }}"
+    #     auth_kind: "{{ gcp_cred_kind }}"
+    #     service_account_file: "{{ gcp_cred_file }}"
     #     state: present
-    #     service_account_email: "{{ lookup('env','GCP_SA_EMAIL') }}"
-    #     credentials_file: "./serviceaccount.json"
-    #     service_account_permissions:
-    #       - compute-rw
-    #     project_id: "{{ lookup('env','GCP_PROJECT_ID') }}"
-    #     disk_size: 10
-    #   register: gce_info
+    #   register: disk
+    # - name: create a network
+    #   gcp_compute_network:
+    #     name: "default"
+    #     project: "{{ gcp_project }}"
+    #     auth_kind: "{{ gcp_cred_kind }}"
+    #     service_account_file: "{{ gcp_cred_file }}"
+    #     scopes:
+    #       - https://www.googleapis.com/auth/compute
+    #     state: present
+    #   register: network
+    # - name: create a address
+    #   gcp_compute_address:
+    #     name: "address-instance-{{ inventory_hostname }}"
+    #     region: "{{ gcp_region }}"
+    #     project: "{{ gcp_project }}"
+    #     auth_kind: "{{ gcp_cred_kind }}"
+    #     service_account_file: "{{ gcp_cred_file }}"
+    #     state: present
+    #   register: address
+    # - name: create a instance
+    #   gcp_compute_instance:
+    #     name: "{{ inventory_hostname }}"
+    #     machine_type: "{{ type }}"
+    #     disks:
+    #       - auto_delete: "true"
+    #         boot: "true"
+    #         source: "{{ disk }}"
+    #     network_interfaces:
+    #       - network: "{{ network }}"
+    #         access_configs:
+    #           - name: External NAT
+    #             nat_ip: "{{ address }}"
+    #             type: ONE_TO_ONE_NAT
+    #     zone: "{{ gcp_zone }}"
+    #     project: "{{ gcp_project }}"
+    #     auth_kind: "{{ gcp_cred_kind }}"
+    #     service_account_file: "{{ gcp_cred_file }}"
+    #     state: present
+    - name: create instances
+      delegate_to: localhost
+      gce:
+        instance_names: "{{ inventory_hostname }}"
+        zone: "{{ gcp_zone }}"
+        machine_type: "{{ type }}"
+        image: "{{ image }}"
+        state: present
+        service_account_email: "{{ lookup('env','GCP_SA_EMAIL') }}"
+        credentials_file: "./serviceaccount.json"
+        service_account_permissions:
+          - compute-rw
+        project_id: "{{ lookup('env','GCP_PROJECT_ID') }}"
+        disk_size: 10
+      register: gce_info
 
     - name: set fact public_ip
       set_fact: public_ip={{ gce_info.networkInterfaces[0].accessConfigs[0].natIP }}
