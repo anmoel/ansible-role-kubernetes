@@ -59,4 +59,4 @@ jobs:
           ENCODED_SSH_KEY: ${{ secrets.ENCODED_SSH_KEY }}
       - name: run ansible-playbook
         run: |
-          ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -v --diff -i ${GITHUB_WORKSPACE}/tests/allinone/inventory
+          ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -vvv --diff -i ${GITHUB_WORKSPACE}/tests/allinone/inventory

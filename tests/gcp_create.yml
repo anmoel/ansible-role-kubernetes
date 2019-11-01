@@ -7,7 +7,7 @@
     - name: create a disk
       gcp_compute_disk:
         name: "disk-instance-{{ inventory_hostname }}"
-        size_gb: 20
+        size_gb: 10
         source_image: "{{ image }}"
         zone: "{{ gcp_zone }}"
         project: "{{ lookup('env','GCP_PROJECT_ID') }}"
@@ -73,7 +73,7 @@
       set_fact: public_ip={{ gce_info.networkInterfaces[0].accessConfigs[0].natIP }}
 
     - name: set fact private_ip
-      set_fact: private_ip={{ gce_info.inetworkInterfaces[0].networkIP }}
+      set_fact: private_ip={{ gce_info.networkInterfaces[0].networkIP }}
 
     - name: set fact ansible_host
       set_fact: ansible_host={{ public_ip }}
