@@ -22,7 +22,7 @@ jobs:
           echo ${GITHUB_WORKSPACE}
           echo "$ENCODED_SA_JSON" | base64 -d > ${GITHUB_WORKSPACE}/tests/serviceaccount.json
           echo "$ENCODED_SSH_KEY" | base64 -d > ${HOME}/id_rsa
-        env: # Or as an environment variable
+        env:
           ENCODED_SA_JSON: ${{ secrets.ENCODED_SA_JSON }}
           ENCODED_SSH_KEY: ${{ secrets.ENCODED_SSH_KEY }}
       - name: ansible lint
@@ -33,6 +33,9 @@ jobs:
       - name: ansible syntax check
         run: |
           ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -i ${GITHUB_WORKSPACE}/tests/single_master/inventory --syntax-check
+        env:
+          GCP_SA_EMAIL: ${{ secrets.GCP_SA_EMAIL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   all-in-one:
     runs-on: ubuntu-latest
     container:
@@ -60,3 +63,6 @@ jobs:
       - name: run ansible-playbook
         run: |
           ansible-playbook ${GITHUB_WORKSPACE}/tests/site.yml -v --diff -i ${GITHUB_WORKSPACE}/tests/allinone/inventory
+        env:
+          GCP_SA_EMAIL: ${{ secrets.GCP_SA_EMAIL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
