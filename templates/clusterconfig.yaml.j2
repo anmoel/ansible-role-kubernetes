@@ -23,7 +23,7 @@ etcd:
   external:
     endpoints:
 {% for n in groups.etcd %}
-    - "https://{{ hostvars[n]['ansible_host'] | default(hostvars[n]['ansible_default_ipv4.address']) }}:{{ kubernetes_etcd_client_port }}"
+    - "https://{{ hostvars[n].ansible_host | default(hostvars[n].ansible_default_ipv4.address) }}:{{ kubernetes_etcd_client_port }}"
 {% endfor %}
     caFile: {{ kubernetes_etcd_ca_cert_file }}
     certFile: {{ kubernetes_etcd_apiserver_client_cert_file }}
@@ -34,11 +34,11 @@ etcd:
 - "{{ kubernetes_apiserver_dns }}"
 controlPlaneEndpoint: "{{ kubernetes_apiserver_dns }}:{{ kubernetes_apiserver_port}}"
 {% else %}
-controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host'])| default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}:{{ kubernetes_apiserver_port}}"
+controlPlaneEndpoint: "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]].ansible_host)| default(hostvars[groups.k8s_masters[0]].ansible_default_ipv4.address) }}:{{ kubernetes_apiserver_port}}"
 {% endif %}
 apiServer:
   certSANs:
-  - "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]]['ansible_host']) | default(hostvars[groups.k8s_masters[0]]['ansible_default_ipv4.address']) }}"
+  - "{{ kubernetes_apiserver_ip | default(hostvars[groups.k8s_masters[0]].ansible_host) | default(hostvars[groups.k8s_masters[0]].ansible_default_ipv4.address) }}"
   extraArgs:
     authorization-mode: {{ kubernetes_authorization_mode }}
     enable-admission-plugins: {{ kubernetes_enable_admission_plugins }}
